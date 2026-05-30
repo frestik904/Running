@@ -151,6 +151,55 @@
     ::-webkit-scrollbar { width: 4px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: var(--border-hover); border-radius: 2px; }
+
+    /* === DESKTOP (≥768px) === */
+    @media (min-width: 768px) {
+      body { max-width: 100%; }
+
+      .nav {
+        position: fixed; top: 0; left: 0; bottom: auto;
+        transform: none; width: 220px; max-width: 220px;
+        height: 100dvh; flex-direction: column;
+        border-top: none; border-right: 1px solid var(--border);
+        padding: 24px 0; justify-content: flex-start; gap: 2px;
+      }
+      .nav-btn {
+        flex-direction: row; justify-content: flex-start;
+        gap: 12px; padding: 10px 24px;
+        font-size: 13px; letter-spacing: 0;
+      }
+      .nav-btn i { font-size: 20px; }
+      .nav-btn.active { background: var(--bg-input); border-radius: 0; }
+
+      .page { padding: 40px; margin-left: 220px; max-width: none; }
+
+      .metric-grid { grid-template-columns: repeat(4, 1fr); gap: 14px; }
+
+      .streak-banner { padding: 24px 28px; }
+      .streak-name { font-size: 24px; }
+      .streak-num { font-size: 52px; }
+
+      .week-bars { height: 130px; gap: 10px; }
+
+      .form-row { grid-template-columns: repeat(3, 1fr); }
+      .mood-btn { font-size: 28px; padding: 14px; }
+
+      .heatmap-grid { gap: 5px; max-width: 500px; }
+
+      #advice-list { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+      .donut-wrap { height: 260px; max-width: 400px; }
+
+      .card { padding: 20px; }
+
+      select, input[type=text], input[type=number], input[type=date], textarea {
+        font-size: 15px; padding: 12px 14px;
+      }
+
+      .activity-item { padding: 13px 0; }
+      .activity-icon { width: 48px; height: 48px; font-size: 24px; }
+      .activity-name { font-size: 15px; }
+    }
   </style>
 </head>
 <body>
