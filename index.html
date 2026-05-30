@@ -276,6 +276,21 @@
     .stat-val { font-size: 22px; font-weight: var(--fw-bold); color: var(--text-primary); }
     .stat-label { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
 
+    /* EXERCISE BUILDER */
+    .exercise-list { margin-bottom: 12px; }
+    .exercise-row { display: flex; gap: 6px; align-items: center; margin-bottom: 8px; flex-wrap: wrap; }
+    .exercise-row input { flex: 1; min-width: 0; padding: 8px 10px; font-size: 13px; background: var(--bg-primary); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary); outline: none; font-family: inherit; }
+    .exercise-row input:focus { border-color: var(--accent); }
+    .ex-name { min-width: 100px; flex: 2 !important; }
+    .ex-sets, .ex-reps, .ex-weight { max-width: 55px; text-align: center; }
+    .ex-x, .ex-at, .ex-unit { color: var(--text-secondary); font-size: 11px; flex-shrink: 0; }
+    .ex-del { background: none; border: none; color: var(--danger); cursor: pointer; font-size: 16px; padding: 4px 6px; border-radius: 4px; opacity: 0.6; transition: opacity 0.15s; }
+    .ex-del:hover { opacity: 1; background: rgba(224,75,74,0.1); }
+    .add-ex-btn { display: flex; align-items: center; gap: 6px; padding: 8px 14px; background: var(--bg-input); border: 1px dashed var(--border); border-radius: 10px; color: var(--text-secondary); font-size: 13px; cursor: pointer; font-family: inherit; transition: border-color 0.15s, color 0.15s; width: 100%; justify-content: center; }
+    .add-ex-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .sport-section { display: none; }
+    .sport-section.visible { display: block; }
+
     /* EXPORT BTN */
     .export-btn { display: flex; align-items: center; gap: 6px; padding: 8px 14px; background: var(--bg-input); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text-secondary); font-size: 12px; cursor: pointer; transition: color 0.15s, border-color 0.15s; margin-left: auto; }
     .export-btn:hover { color: var(--accent); border-color: var(--accent); }
@@ -506,19 +521,28 @@
           <input type="text" id="act-duration" placeholder="45" />
         </div>
       </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label" for="act-pace">Passo medio (mm:ss/km, opz.)</label>
-          <input type="text" id="act-pace" placeholder="4:30" />
-        </div>
-        <div class="form-group">
-          <label class="form-label" for="act-calories">Calorie bruciate (opz.)</label>
-          <input type="number" id="act-calories" min="0" placeholder="320" />
+      <div id="running-section" class="sport-section visible">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="act-pace">Passo medio (mm:ss/km, opz.)</label>
+            <input type="text" id="act-pace" placeholder="4:30" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="act-distance">Distanza (km, opzionale)</label>
+            <input type="number" id="act-distance" min="0" step="0.1" placeholder="5.5" />
+          </div>
         </div>
       </div>
       <div class="form-group">
-        <label class="form-label" for="act-distance">Distanza (km, opzionale)</label>
-        <input type="number" id="act-distance" min="0" step="0.1" placeholder="5.5" />
+        <label class="form-label" for="act-calories">Calorie bruciate (opz.)</label>
+        <input type="number" id="act-calories" min="0" placeholder="320" />
+      </div>
+      <div id="palestra-section" class="sport-section">
+        <div class="form-group">
+          <label class="form-label">Esercizi</label>
+          <div class="exercise-list" id="exercise-list"></div>
+          <button type="button" class="add-ex-btn" id="add-ex-btn"><i class="ti ti-plus"></i> Aggiungi esercizio</button>
+        </div>
       </div>
       <div class="form-group">
         <label class="form-label">Intensità — <strong id="intensity-label">Media</strong></label>
@@ -673,6 +697,19 @@
     <div class="empty-icon-wrap" style="width:48px;height:48px"><i class="ti ti-trophy-off" style="font-size:22px"></i></div>
     <h3 class="empty-title" style="font-size:15px">Ancora nessun record</h3>
     <p class="empty-desc" style="font-size:13px">I tuoi primati appariranno qui dopo ogni allenamento.</p>
+  </div>
+</template>
+
+<template id="tpl-exercise">
+  <div class="exercise-row">
+    <input type="text" class="ex-name" placeholder="Esercizio" />
+    <input type="number" class="ex-sets" placeholder="4" min="1" />
+    <span class="ex-x">×</span>
+    <input type="number" class="ex-reps" placeholder="10" min="1" />
+    <span class="ex-at">@</span>
+    <input type="number" class="ex-weight" placeholder="80" min="0" step="2.5" />
+    <span class="ex-unit">kg</span>
+    <button type="button" class="ex-del" aria-label="Rimuovi">✕</button>
   </div>
 </template>
 
@@ -1019,6 +1056,13 @@
     var meta = [durDisplay + (durDisplay.indexOf(':') > -1 ? '' : ' min')];
     if (activity.distance > 0) meta.push(activity.distance.toFixed(1) + ' km');
     if (activity.pace) meta.push(formatPace(activity.pace));
+    if (activity.exercises && activity.exercises.length) {
+      var exText = activity.exercises.slice(0, 3).map(function(ex) {
+        return ex.name.split(' ')[0] + ' ' + ex.sets + '\u00d7' + ex.reps + (ex.weight ? '@' + ex.weight : '');
+      }).join(', ');
+      if (activity.exercises.length > 3) exText += ' (+' + (activity.exercises.length - 3) + ')';
+      meta.push(exText);
+    }
     meta.push(getCalories(activity) + ' kcal');
     clone.querySelector('.activity-meta').textContent = meta.join(' · ');
     const badge = clone.querySelector('.badge');
@@ -1063,9 +1107,11 @@
     document.getElementById('act-pace').value = '';
     document.getElementById('act-calories').value = '';
     document.getElementById('act-notes').value = '';
+    document.getElementById('exercise-list').innerHTML = '';
     updateIntensity(2);
     selectedMood = '😊';
     editingId = null;
+    toggleSportSections(document.getElementById('sport-type').value);
     document.querySelectorAll('.mood-btn').forEach(function(b) { b.classList.remove('selected'); });
     document.querySelector('.mood-btn[data-mood="😊"]').classList.add('selected');
     document.querySelector('.save-btn').innerHTML = '<i class="ti ti-device-floppy"></i> Salva attività';
@@ -1075,6 +1121,40 @@
 
   function updateIntensity(v) {
     document.getElementById('intensity-label').textContent = intensityName(v);
+  }
+
+  function toggleSportSections(sport) {
+    var isRunning = sport.indexOf('Running') > -1;
+    var isPalestra = sport.indexOf('Palestra') > -1;
+    document.getElementById('running-section').classList.toggle('visible', isRunning);
+    document.getElementById('palestra-section').classList.toggle('visible', isPalestra);
+  }
+
+  function addExercise(name, sets, reps, weight) {
+    var clone = document.getElementById('tpl-exercise').content.cloneNode(true);
+    var row = clone.querySelector('.exercise-row');
+    if (name) row.querySelector('.ex-name').value = name;
+    if (sets) row.querySelector('.ex-sets').value = sets;
+    if (reps) row.querySelector('.ex-reps').value = reps;
+    if (weight) row.querySelector('.ex-weight').value = weight;
+    row.querySelector('.ex-del').addEventListener('click', function() { row.remove(); });
+    document.getElementById('exercise-list').appendChild(clone);
+  }
+
+  function collectExercises() {
+    if (!document.getElementById('palestra-section').classList.contains('visible')) return [];
+    var rows = document.querySelectorAll('#exercise-list .exercise-row');
+    var result = [];
+    rows.forEach(function(row) {
+      var name = row.querySelector('.ex-name').value.trim();
+      var sets = parseInt(row.querySelector('.ex-sets').value);
+      var reps = parseInt(row.querySelector('.ex-reps').value);
+      var weight = parseFloat(row.querySelector('.ex-weight').value);
+      if (name && sets > 0 && reps > 0) {
+        result.push({ name: name, sets: sets, reps: reps, weight: isNaN(weight) ? 0 : weight });
+      }
+    });
+    return result;
   }
 
   function hideSuccess() {
@@ -1102,6 +1182,11 @@
     var moodBtn = document.querySelector('.mood-btn[data-mood="' + activity.mood + '"]');
     if (moodBtn) moodBtn.classList.add('selected');
     document.getElementById('act-notes').value = activity.notes || '';
+    document.getElementById('exercise-list').innerHTML = '';
+    toggleSportSections(activity.sport);
+    if (activity.exercises && activity.exercises.length) {
+      activity.exercises.forEach(function(ex) { addExercise(ex.name, ex.sets, ex.reps, ex.weight); });
+    }
     document.querySelector('.save-btn').innerHTML = '<i class="ti ti-device-floppy"></i> Aggiorna attività';
     showPage('log', document.querySelector('[data-page="log"]'));
   }
@@ -1138,6 +1223,8 @@
     if (parsedPace !== null) activity.pace = parsedPace;
     var calRaw = parseInt(document.getElementById('act-calories').value);
     if (!isNaN(calRaw) && calRaw > 0) activity.calories = calRaw;
+    var exList = collectExercises();
+    if (exList.length) activity.exercises = exList;
 
     if (editMode) {
       var idx = activities.findIndex(function(a) { return a.id === editingId; });
@@ -1363,19 +1450,51 @@
       document.getElementById('summary-stats-card').style.display = 'none';
     }
 
-    var maxRun = 0;
-    activities.forEach(function(a) { if (a.distance > maxRun) maxRun = a.distance; });
-    var maxDur = activities.reduce(function(m, a) { return a.duration > m ? a.duration : m; }, 0);
     var streak = calcStreak();
     var prEl = document.getElementById('pr-list');
     if (!activities.length) {
       prEl.innerHTML = '';
       prEl.appendChild(document.getElementById('tpl-empty-records').content.cloneNode(true));
     } else {
-      prEl.innerHTML = '<div class="pr-item"><span class="pr-label"><i class="ti ti-trophy"></i>Distanza massima</span><span class="pr-val">' + maxRun.toFixed(1) + ' km</span></div>'
-        + '<div class="pr-item"><span class="pr-label"><i class="ti ti-clock"></i>Allenamento più lungo</span><span class="pr-val">' + formatDuration(maxDur) + '</span></div>'
-        + '<div class="pr-item"><span class="pr-label"><i class="ti ti-flame"></i>Serie attuale</span><span class="pr-val">' + streak + ' gg</span></div>'
+      var prHtml = '<div class="pr-item"><span class="pr-label"><i class="ti ti-flame"></i>Serie attuale</span><span class="pr-val">' + streak + ' gg</span></div>'
         + '<div class="pr-item"><span class="pr-label"><i class="ti ti-chart-bar"></i>Totale uscite</span><span class="pr-val">' + activities.length + '</span></div>';
+      var runActs = activities.filter(function(a) { return a.sport.indexOf('Running') > -1; });
+      if (runActs.length) {
+        var maxRun = runActs.reduce(function(m, a) { return Math.max(m, a.distance || 0); }, 0);
+        var bestPace = runActs.reduce(function(m, a) { return a.pace ? Math.min(m, a.pace) : m; }, Infinity);
+        var longestRun = runActs.reduce(function(m, a) { return Math.max(m, a.duration); }, 0);
+        prHtml += '<div class="pr-item" style="margin-top:6px"><span class="pr-label"><i class="ti ti-run" style="color:var(--accent)"></i>Running</span><span class="pr-val"></span></div>';
+        if (maxRun > 0) prHtml += '<div class="pr-item"><span class="pr-label" style="padding-left:16px;font-size:13px">\u203a Distanza max</span><span class="pr-val">' + maxRun.toFixed(1) + ' km</span></div>';
+        if (bestPace < Infinity) {
+          var bpM = Math.floor(bestPace / 60);
+          var bpS = bestPace % 60;
+          prHtml += '<div class="pr-item"><span class="pr-label" style="padding-left:16px;font-size:13px">\u203a Passo migliore</span><span class="pr-val">' + bpM + ':' + String(bpS).padStart(2, '0') + ' /km</span></div>';
+        }
+        prHtml += '<div class="pr-item"><span class="pr-label" style="padding-left:16px;font-size:13px">\u203a Durata max</span><span class="pr-val">' + formatDuration(longestRun) + '</span></div>';
+      }
+      var palActs = activities.filter(function(a) { return a.sport.indexOf('Palestra') > -1; });
+      if (palActs.length) {
+        var maxWeight = 0, maxVol = 0;
+        palActs.forEach(function(a) {
+          if (a.exercises) {
+            var sessVol = 0;
+            a.exercises.forEach(function(ex) {
+              if (ex.weight > maxWeight) maxWeight = ex.weight;
+              sessVol += ex.sets * ex.reps * ex.weight;
+            });
+            if (sessVol > maxVol) maxVol = sessVol;
+          }
+        });
+        prHtml += '<div class="pr-item" style="margin-top:6px"><span class="pr-label"><i class="ti ti-weight" style="color:var(--accent-warm)"></i>Palestra</span><span class="pr-val"></span></div>';
+        if (maxWeight > 0) prHtml += '<div class="pr-item"><span class="pr-label" style="padding-left:16px;font-size:13px">\u203a Peso max</span><span class="pr-val">' + maxWeight + ' kg</span></div>';
+        if (maxVol > 0) {
+          var volUnit = maxVol >= 1000 ? (maxVol / 1000).toFixed(1) + 'k' : maxVol;
+          prHtml += '<div class="pr-item"><span class="pr-label" style="padding-left:16px;font-size:13px">\u203a Volume max</span><span class="pr-val">' + volUnit + ' kg</span></div>';
+        }
+        var avgPalDur = Math.round(palActs.reduce(function(s, a) { return s + a.duration; }, 0) / palActs.length);
+        prHtml += '<div class="pr-item"><span class="pr-label" style="padding-left:16px;font-size:13px">\u203a Durata media</span><span class="pr-val">' + formatDuration(avgPalDur) + '</span></div>';
+      }
+      prEl.innerHTML = prHtml;
     }
 
     var allEl = document.getElementById('all-activities');
@@ -1393,6 +1512,14 @@
     }
   }
 
+  function getVolumeWeek(acts) {
+    var vol = 0;
+    acts.forEach(function(a) {
+      if (a.exercises) a.exercises.forEach(function(ex) { vol += ex.sets * ex.reps * (ex.weight || 0); });
+    });
+    return vol;
+  }
+
   function renderInsights() {
     var advEl = document.getElementById('advice-list');
     if (!activities.length) {
@@ -1400,13 +1527,33 @@
     } else {
       var now = todayMidnight();
       var recent7 = activities.filter(function(a) { return daysBetween(now, dateFromStr(a.date)) < 7; });
+      var last7 = activities.filter(function(a) { var d = daysBetween(now, dateFromStr(a.date)); return d >= 7 && d < 14; });
       var avgInt = recent7.length ? recent7.reduce(function(s, a) { return s + a.intensity; }, 0) / recent7.length : 0;
       var totalKm7 = recent7.reduce(function(s, a) { return s + a.distance; }, 0);
       var badMoods = activities.slice(0, BAD_MOOD_WINDOW).filter(function(a) { return a.mood === '😫' || a.mood === '😐'; }).length;
       var advices = [];
       if (recent7.length >= 4) advices.push({ icon: 'ti-refresh', tag: 'RECUPERO', text: 'Hai fatto ' + recent7.length + ' allenamenti negli ultimi 7 giorni. Ottimo ritmo! Assicurati di includere almeno un giorno di riposo completo.' });
       if (avgInt >= 3) advices.push({ icon: 'ti-heart-rate-monitor', tag: 'INTENSITÀ', text: 'L\'intensità media dei tuoi allenamenti recenti è elevata. Considera di inserire una sessione leggera o stretching per bilanciare il carico.' });
-      if (totalKm7 > 0) advices.push({ icon: 'ti-trending-up', tag: 'PROGRESSIONE', text: 'Questa settimana hai percorso ' + totalKm7.toFixed(1) + ' km. Per migliorare in modo graduale, la prossima settimana punta a ' + (totalKm7 * PROGRESSION_FACTOR).toFixed(1) + ' km (+10%).' });
+      if (totalKm7 > 0) {
+        var prevKm7 = last7.reduce(function(s, a) { return s + a.distance; }, 0);
+        var kmDelta = prevKm7 > 0 ? ((totalKm7 - prevKm7) / prevKm7 * 100).toFixed(0) : '+100';
+        advices.push({ icon: 'ti-trending-up', tag: 'RUNNING', text: 'Questa settimana hai corso ' + totalKm7.toFixed(1) + ' km' + (prevKm7 > 0 ? ' (' + (kmDelta > 0 ? '+' : '') + kmDelta + '% vs sett. scorsa)' : '') + '. Per migliorare gradualmente, punta a ' + (totalKm7 * PROGRESSION_FACTOR).toFixed(1) + ' km (+10%) la prox settimana.' });
+      }
+      var pal7 = recent7.filter(function(a) { return a.sport.indexOf('Palestra') > -1; });
+      if (pal7.length) {
+        var vol7 = getVolumeWeek(pal7);
+        var palLast7 = last7.filter(function(a) { return a.sport.indexOf('Palestra') > -1; });
+        var volLast = getVolumeWeek(palLast7);
+        if (vol7 > 0) {
+          var volDelta = volLast > 0 ? ((vol7 - volLast) / volLast * 100).toFixed(0) : '+100';
+          var volDisplay = vol7 >= 1000 ? (vol7 / 1000).toFixed(1) + 'k' : vol7;
+          var advText = 'Volume totale in palestra questa settimana: ' + volDisplay + ' kg' + (volLast > 0 ? ' (' + (volDelta > 0 ? '+' : '') + volDelta + '% vs sett. scorsa)' : '') + '.';
+          if (volDelta > 20) advText += ' Aumento significativo — assicurati un adeguato recupero.';
+          else if (volDelta < -20) advText += ' Settimana di scarico? A volte il recupero è parte del progresso.';
+          else advText += ' Buona costanza! Per crescere, punta a un +5-10% a settimana.';
+          advices.push({ icon: 'ti-weight', tag: 'PALESTRA', text: advText });
+        }
+      }
       if (badMoods >= 3) advices.push({ icon: 'ti-moon', tag: 'BENESSERE', text: 'In alcuni allenamenti recenti il tuo umore post-workout era basso. Controlla il riposo notturno e valuta di ridurre l\'intensità per qualche giorno.' });
       if (!advices.length) advices.push({ icon: 'ti-star', tag: 'OTTIMO LAVORO', text: 'Stai andando alla grande! Continua a registrare le tue attività per ricevere consigli sempre più precisi.' });
       advEl.innerHTML = advices.map(function(a) {
@@ -1527,6 +1674,14 @@
       updateIntensity(this.value);
     });
 
+    document.getElementById('sport-type').addEventListener('change', function() {
+      toggleSportSections(this.value);
+    });
+
+    document.getElementById('add-ex-btn').addEventListener('click', function() {
+      addExercise();
+    });
+
     document.getElementById('activity-form').addEventListener('submit', saveActivity);
 
     function setupActionDelegation(containerId) {
@@ -1569,6 +1724,7 @@
     document.getElementById('act-date').value = todayStr();
     document.getElementById('act-date').setAttribute('max', todayStr());
     updateIntensity(document.getElementById('act-intensity').value);
+    toggleSportSections(document.getElementById('sport-type').value);
     renderDashboard();
   });
 </script>
