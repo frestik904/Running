@@ -5,80 +5,127 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AthleteLog — Il tuo sport tracker</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --bg-primary: #0f1117;
-      --bg-secondary: #1a1d27;
-      --bg-card: #1e2130;
-      --bg-input: #252840;
+      --bg-primary: #0b0d13;
+      --bg-secondary: #111318;
+      --bg-card: #1a1d27;
+      --bg-input: #23273c;
+      --bg-glass: rgba(26, 29, 39, 0.75);
       --accent: #5adf7c;
       --accent-dim: #1e3a28;
+      --accent-orange: #f0997b;
+      --accent-orange-dim: #2a1e18;
+      --accent-warm: #fac775;
       --text-primary: #f0f2ff;
       --text-secondary: #8b90a8;
-      --border: rgba(255,255,255,0.07);
-      --border-hover: rgba(255,255,255,0.14);
+      --border: rgba(255,255,255,0.06);
+      --border-hover: rgba(255,255,255,0.12);
       --radius-sm: 8px;
       --radius-md: 12px;
       --radius-lg: 16px;
       --on-accent: #0a1a12;
       --danger: #e24b4a;
+      --font-body: 'Inter', -apple-system, 'Segoe UI', sans-serif;
+      --font-mono: 'SF Mono', 'Cascadia Code', 'Consolas', monospace;
+      --fw-light: 300;
+      --fw-regular: 400;
+      --fw-semibold: 600;
+      --fw-bold: 700;
+      --fw-extrabold: 800;
+      --shadow-sm: 0 2px 8px rgba(0,0,0,0.15);
+      --shadow-md: 0 4px 24px rgba(0,0,0,0.2);
+      --shadow-lg: 0 8px 40px rgba(0,0,0,0.3);
+      --gradient-green: linear-gradient(135deg, #5adf7c, #3aaf5c);
+      --gradient-warm: linear-gradient(135deg, #f0997b, #fac775);
+      --gradient-fire: linear-gradient(135deg, #fac775, #f0997b, #e24b4a);
+      --color-running: #5adf7c;
+      --color-gym: #f0997b;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { height: 100%; background: var(--bg-primary); color: var(--text-primary); font-family: -apple-system, 'Segoe UI', sans-serif; }
+    html, body { height: 100%; background: var(--bg-primary); color: var(--text-primary); font-family: var(--font-body); }
     body { display: flex; flex-direction: column; max-width: 480px; margin: 0 auto; min-height: 100vh; position: relative; }
+    ::selection { background: rgba(90,223,124,0.25); color: var(--text-primary); }
 
-    /* NAV */
+    /* SIDEBAR (desktop only) */
+    #sidebar-desktop { display: none; }
+
+    /* NAV MOBILE */
     .nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; display: flex; background: var(--bg-card); border-top: 1px solid var(--border); z-index: 100; padding: 6px 0 10px; }
-    .nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 6px 4px; border: none; background: none; cursor: pointer; color: var(--text-secondary); font-size: 10px; letter-spacing: 0.3px; transition: color 0.15s; }
+    .nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 6px 4px; border: none; background: none; cursor: pointer; color: var(--text-secondary); font-size: 10px; letter-spacing: 0.3px; transition: color 0.15s; position: relative; overflow: hidden; }
     .nav-btn i { font-size: 22px; }
     .nav-btn.active { color: var(--accent); }
+    .nav-btn .ripple { position: absolute; border-radius: 50%; background: rgba(90,223,124,0.25); transform: scale(0); animation: rippleEffect 0.6s ease-out; pointer-events: none; }
 
     /* PAGES */
     .page { display: none; padding: 20px 16px 100px; flex: 1; overflow-y: auto; }
     .page.active { display: block; }
+    .page { opacity: 0; transform: translateY(12px); transition: opacity 0.35s cubic-bezier(0.4,0,0.2,1), transform 0.35s cubic-bezier(0.4,0,0.2,1); }
+    .page.active { opacity: 1; transform: translateY(0); }
 
     /* HEADER */
     .page-header { margin-bottom: 20px; }
-    .page-title { font-size: 22px; font-weight: 700; color: var(--text-primary); }
-    .page-sub { font-size: 14px; color: var(--text-secondary); margin-top: 3px; }
+    .page-title { font-size: 22px; font-weight: var(--fw-extrabold); color: var(--text-primary); letter-spacing: -0.3px; }
+    .page-sub { font-size: 14px; color: var(--text-secondary); margin-top: 3px; font-weight: var(--fw-light); }
 
     /* CARDS */
-    .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px; margin-bottom: 14px; }
-    .card-label { font-size: 11px; font-weight: 600; letter-spacing: 0.8px; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 12px; }
+    .card {
+      background: var(--bg-glass); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px; margin-bottom: 14px;
+      box-shadow: var(--shadow-sm); transition: box-shadow 0.2s, border-color 0.2s, transform 0.2s;
+    }
+    .card:hover { border-color: var(--border-hover); box-shadow: var(--shadow-md); transform: translateY(-1px); }
+    .card-label { font-size: 11px; font-weight: var(--fw-semibold); letter-spacing: 0.8px; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 12px; }
 
     /* STREAK BANNER */
-    .streak-banner { background: linear-gradient(135deg, var(--accent-dim) 0%, #1a2535 100%); border: 1px solid rgba(90,223,124,0.15); border-radius: var(--radius-lg); padding: 18px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; }
-    .streak-name { font-size: 18px; font-weight: 700; }
+    .streak-banner {
+      background: linear-gradient(135deg, var(--accent-dim) 0%, #1a2535 50%, #1e1a35 100%);
+      border: 1px solid rgba(90,223,124,0.15); border-radius: var(--radius-lg);
+      padding: 18px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center;
+      position: relative; overflow: hidden; box-shadow: 0 4px 20px rgba(90,223,124,0.08);
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    .streak-banner::before { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(90,223,124,0.05), transparent); animation: streakShimmer 4s ease-in-out infinite; pointer-events: none; }
+    .streak-banner.streak-zero { border-color: rgba(255,255,255,0.08); background: linear-gradient(135deg, var(--bg-card) 0%, #1a1d27 100%); }
+    .streak-banner.streak-zero::before { display: none; }
+    .streak-banner.streak-fire { border-color: rgba(250,199,117,0.3); box-shadow: 0 4px 30px rgba(250,199,117,0.12); }
+    .streak-name { font-size: 18px; font-weight: var(--fw-bold); }
     .streak-sub { font-size: 13px; color: var(--text-secondary); margin-top: 4px; }
-    .streak-num { font-size: 42px; line-height: 1; }
+    .streak-num { font-size: 42px; line-height: 1; font-weight: var(--fw-extrabold); background: var(--gradient-green); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1); }
+    .streak-banner.streak-fire .streak-num { background: var(--gradient-warm); -webkit-background-clip: text; background-clip: text; }
+    .streak-num.pop { animation: streakPop 0.6s cubic-bezier(0.34,1.56,0.64,1); }
+    .streak-num.milestone { animation: streakMilestone 1.5s ease-in-out infinite; }
+    .streak-emoji { -webkit-text-fill-color: initial; }
 
     /* METRIC GRID */
     .metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
-    .metric-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 14px; }
-    .metric-label { font-size: 11px; color: var(--text-secondary); margin-bottom: 6px; }
-    .metric-val { font-size: 26px; font-weight: 700; color: var(--text-primary); line-height: 1; }
-    .metric-unit { font-size: 13px; font-weight: 400; color: var(--text-secondary); }
+    .metric-card { background: var(--bg-glass); backdrop-filter: blur(12px); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 14px; box-shadow: var(--shadow-sm); transition: transform 0.15s, box-shadow 0.15s; }
+    .metric-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+    .metric-label { font-size: 11px; color: var(--text-secondary); margin-bottom: 6px; font-weight: var(--fw-light); }
+    .metric-val { font-size: 26px; font-weight: var(--fw-bold); color: var(--text-primary); line-height: 1; }
+    .metric-val.flash { animation: metricFlash 0.3s ease; }
+    .metric-unit { font-size: 13px; font-weight: var(--fw-regular); color: var(--text-secondary); }
 
     /* ACTIVITY ITEMS */
     .activity-item { display: flex; align-items: flex-start; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--border); }
     .activity-item:last-child { border-bottom: none; }
-    .activity-icon { width: 42px; height: 42px; border-radius: var(--radius-sm); background: var(--bg-input); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
-    .activity-icon i { font-size: 20px; }
-    .activity-name { font-size: 14px; font-weight: 600; }
+    .activity-icon { width: 42px; height: 42px; border-radius: 10px; background: var(--bg-input); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+    .activity-name { font-size: 14px; font-weight: var(--fw-semibold); }
     .activity-meta { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
     .activity-notes { font-size: 12px; color: var(--text-secondary); margin-top: 4px; line-height: 1.4; font-style: italic; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
     .activity-right { margin-left: auto; text-align: right; flex-shrink: 0; }
     .activity-mood { font-size: 18px; }
     .activity-date { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
-
-    /* ACTIVITY ACTIONS */
     .activity-actions { display: flex; gap: 2px; margin-top: 4px; justify-content: flex-end; }
     .btn-icon { background: none; border: none; cursor: pointer; color: var(--text-secondary); padding: 4px; border-radius: 4px; font-size: 14px; transition: color 0.15s, background 0.15s; }
     .btn-icon:hover { color: var(--accent); background: var(--bg-input); }
     .btn-icon.btn-danger:hover { color: var(--danger); }
 
     /* BADGES */
-    .badge { display: inline-block; font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 99px; margin-top: 4px; }
+    .badge { display: inline-block; font-size: 10px; font-weight: var(--fw-semibold); padding: 2px 8px; border-radius: 99px; margin-top: 4px; }
     .badge-easy { background: rgba(90,223,124,0.12); color: #5adf7c; }
     .badge-medium { background: rgba(250,199,117,0.12); color: #fac775; }
     .badge-hard { background: rgba(240,153,123,0.12); color: #f0997b; }
@@ -88,8 +135,9 @@
     .week-bars { display: flex; gap: 6px; align-items: flex-end; height: 90px; margin-top: 4px; }
     .week-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; height: 100%; }
     .week-bar-wrap { flex: 1; display: flex; align-items: flex-end; width: 100%; }
-    .week-bar { width: 100%; border-radius: 4px 4px 0 0; background: var(--bg-input); transition: height 0.4s ease; min-height: 4px; }
-    .week-bar.active { background: var(--accent); }
+    .week-bar { width: 100%; border-radius: 4px 4px 0 0; background: var(--bg-input); min-height: 4px; transform-origin: bottom; height: 4px; }
+    .week-bar.active { background: linear-gradient(to top, var(--accent), var(--accent-orange)); }
+    .week-bar.animate { animation: barGrow 0.6s cubic-bezier(0.34,1.56,0.64,1) forwards; }
     .week-day { font-size: 10px; color: var(--text-secondary); }
     .week-km { font-size: 9px; color: var(--accent); min-height: 12px; }
 
@@ -99,7 +147,7 @@
     .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     select, input[type=text], input[type=number], input[type=date], textarea {
       width: 100%; background: var(--bg-input); border: 1px solid var(--border);
-      border-radius: var(--radius-sm); color: var(--text-primary); font-size: 14px;
+      border-radius: 10px; color: var(--text-primary); font-size: 14px;
       padding: 10px 12px; outline: none; font-family: inherit; transition: border-color 0.15s;
       -webkit-appearance: none; appearance: none;
     }
@@ -110,26 +158,47 @@
 
     /* RANGE */
     .range-wrap input[type=range] { width: 100%; height: 4px; -webkit-appearance: none; appearance: none; background: var(--bg-input); border-radius: 2px; outline: none; cursor: pointer; }
-    .range-wrap input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--accent); cursor: pointer; }
+    .range-wrap input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--accent); cursor: pointer; transition: box-shadow 0.2s ease, transform 0.15s ease; }
+    .range-wrap input[type=range]:hover::-webkit-slider-thumb { box-shadow: 0 0 0 4px rgba(90,223,124,0.2), 0 0 16px rgba(90,223,124,0.3); transform: scale(1.1); }
+    .range-wrap input[type=range]:active::-webkit-slider-thumb { transform: scale(1.2); box-shadow: 0 0 0 6px rgba(90,223,124,0.25), 0 0 24px rgba(90,223,124,0.4); }
     .intensity-labels { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-secondary); margin-top: 6px; }
 
     /* MOOD */
     .mood-row { display: flex; gap: 8px; }
-    .mood-btn { flex: 1; padding: 10px 4px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--bg-input); cursor: pointer; font-size: 22px; text-align: center; transition: all 0.15s; }
-    .mood-btn.selected { border-color: var(--accent); background: var(--accent-dim); }
+    .mood-btn { flex: 1; padding: 10px 4px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--bg-input); cursor: pointer; font-size: 22px; text-align: center; transition: transform 0.15s cubic-bezier(0.34,1.56,0.64,1), border-color 0.15s, background 0.15s; }
+    .mood-btn:hover { transform: scale(1.05); border-color: var(--accent); background: var(--accent-dim); }
+    .mood-btn.selected { border-color: var(--accent); background: var(--accent-dim); animation: moodBounce 0.4s cubic-bezier(0.34,1.56,0.64,1); }
 
     /* SAVE BTN */
-    .save-btn { width: 100%; padding: 15px; background: var(--accent); color: var(--on-accent); border: none; border-radius: var(--radius-md); font-size: 15px; font-weight: 700; cursor: pointer; margin-top: 4px; transition: opacity 0.15s, transform 0.1s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .save-btn {
+      width: 100%; padding: 15px; background: var(--accent); color: var(--on-accent);
+      border: none; border-radius: var(--radius-md); font-size: 15px; font-weight: var(--fw-bold);
+      cursor: pointer; margin-top: 4px; position: relative; overflow: hidden;
+      transition: opacity 0.15s, transform 0.1s, background 0.3s;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
     .save-btn:hover { opacity: 0.9; }
     .save-btn:active { transform: scale(0.98); }
+    .save-btn.saving { pointer-events: none; opacity: 0.7; background: var(--bg-input); }
+    .save-btn.saving i.ti-loader { animation: spin 0.8s linear infinite; }
+    .save-btn.saved { background: var(--accent); pointer-events: none; }
+    .save-btn.saved i.ti-circle-check { animation: checkPop 0.4s cubic-bezier(0.175,0.885,0.32,1.275); }
 
     /* MESSAGES */
-    .success-msg { display: none; align-items: center; gap: 10px; color: var(--accent); background: var(--accent-dim); border: 1px solid rgba(90,223,124,0.2); border-radius: var(--radius-sm); padding: 12px 14px; margin-top: 12px; font-size: 14px; font-weight: 500; }
+    .success-msg {
+      display: flex; align-items: center; gap: 10px; color: var(--accent); background: var(--accent-dim);
+      border: 1px solid rgba(90,223,124,0.2); border-radius: var(--radius-sm); padding: 12px 14px;
+      margin-top: 12px; font-size: 14px; font-weight: 500;
+      transform: translateX(-100%); opacity: 0; transition: transform 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.4s cubic-bezier(0.4,0,0.2,1);
+    }
+    .success-msg.visible { transform: translateX(0); opacity: 1; }
     .error-msg { display: none; align-items: center; gap: 10px; color: var(--danger); background: rgba(224,75,74,0.12); border: 1px solid rgba(224,75,74,0.2); border-radius: var(--radius-sm); padding: 12px 14px; margin-top: 12px; font-size: 14px; font-weight: 500; }
 
     /* HEATMAP */
     .heatmap-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-top: 8px; }
-    .heat-cell { aspect-ratio: 1; border-radius: 3px; background: var(--bg-input); }
+    .heat-cell { aspect-ratio: 1; border-radius: 4px; background: var(--bg-input); cursor: pointer; position: relative; }
+    .heat-cell::after { content: attr(data-tooltip); position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%) scale(0.9); background: var(--bg-card); color: var(--text-primary); font-size: 11px; padding: 4px 8px; border-radius: 4px; border: 1px solid var(--border); white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity 0.15s ease, transform 0.15s ease; }
+    .heat-cell:hover::after { opacity: 1; transform: translateX(-50%) scale(1); }
     .heat-1 { background: rgba(90,223,124,0.25); }
     .heat-2 { background: rgba(90,223,124,0.55); }
     .heat-3 { background: var(--accent); }
@@ -143,14 +212,15 @@
     .pr-item:last-child { border-bottom: none; }
     .pr-label { font-size: 14px; color: var(--text-secondary); display: flex; align-items: center; gap: 8px; }
     .pr-label i { font-size: 18px; color: var(--accent); }
-    .pr-val { font-size: 16px; font-weight: 700; }
+    .pr-val { font-size: 16px; font-weight: var(--fw-bold); }
 
     /* ADVICE */
-    .advice-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px; margin-bottom: 12px; }
+    .advice-card { background: var(--bg-glass); backdrop-filter: blur(12px); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px; margin-bottom: 12px; transition: transform 0.25s ease, border-color 0.25s ease; }
+    .advice-card:hover { border-color: var(--border-hover); transform: translateX(4px); }
     .advice-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-    .advice-icon-wrap { width: 36px; height: 36px; border-radius: var(--radius-sm); background: var(--accent-dim); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .advice-icon-wrap { width: 36px; height: 36px; border-radius: 10px; background: var(--accent-dim); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .advice-icon-wrap i { font-size: 20px; color: var(--accent); }
-    .advice-tag { font-size: 11px; font-weight: 600; color: var(--accent); letter-spacing: 0.5px; }
+    .advice-tag { font-size: 11px; font-weight: var(--fw-semibold); color: var(--accent); letter-spacing: 0.5px; }
     .advice-text { font-size: 14px; color: var(--text-secondary); line-height: 1.6; }
 
     /* DONUT */
@@ -158,48 +228,95 @@
     .donut-empty { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: var(--text-secondary); font-size: 14px; }
 
     /* EMPTY STATE */
-    .empty { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 32px 16px; gap: 10px; color: var(--text-secondary); text-align: center; }
-    .empty i { font-size: 44px; opacity: 0.3; }
-    .empty p { font-size: 14px; line-height: 1.5; }
+    .empty { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 24px; gap: 12px; color: var(--text-secondary); text-align: center; }
+    .empty-icon-wrap { width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-dim), rgba(240,153,123,0.1)); display: flex; align-items: center; justify-content: center; margin-bottom: 4px; }
+    .empty-icon-wrap i { font-size: 36px; color: var(--accent); opacity: 0.8; }
+    .empty-icon-orange { background: linear-gradient(135deg, rgba(240,153,123,0.15), rgba(250,199,117,0.1)); }
+    .empty-icon-orange i { color: var(--accent-warm); }
+    .empty-title { font-size: 18px; font-weight: var(--fw-bold); color: var(--text-primary); }
+    .empty-desc { font-size: 14px; line-height: 1.5; color: var(--text-secondary); max-width: 280px; }
 
-    /* LABEL */
+    /* LABEL & FOCUS */
     #intensity-label { color: var(--accent); }
+    button:focus-visible, select:focus-visible, input:focus-visible, textarea:focus-visible { outline: 2px solid var(--accent-orange); outline-offset: 2px; }
 
-    /* FOCUS */
-    button:focus-visible, select:focus-visible, input:focus-visible, textarea:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    /* SCROLLBAR */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.15); }
+
+    /* KEYFRAMES */
+    @keyframes streakShimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+    @keyframes streakPop { 0% { transform: scale(1); } 40% { transform: scale(1.3); } 70% { transform: scale(0.95); } 100% { transform: scale(1); } }
+    @keyframes streakMilestone { 0%, 100% { text-shadow: 0 0 8px rgba(90,223,124,0.3); } 50% { text-shadow: 0 0 20px rgba(90,223,124,0.8), 0 0 40px rgba(250,199,117,0.4); } }
+    @keyframes barGrow { from { transform: scaleY(0); opacity: 0; } to { transform: scaleY(1); opacity: 1; } }
+    @keyframes moodBounce { 0% { transform: scale(1); } 40% { transform: scale(1.25); } 70% { transform: scale(0.95); } 100% { transform: scale(1); } }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes checkPop { 0% { transform: scale(0); } 50% { transform: scale(1.3); } 100% { transform: scale(1); } }
+    @keyframes rippleEffect { to { transform: scale(4); opacity: 0; } }
+    @keyframes metricFlash { 0% { color: var(--accent); transform: scale(1.1); } 100% { color: var(--text-primary); transform: scale(1); } }
 
     /* REDUCED MOTION */
     @media (prefers-reduced-motion: reduce) {
-      .week-bar, .nav-btn, .save-btn, .mood-btn, select, input, textarea, .btn-icon { transition: none; }
+      .page, .week-bar, .nav-btn, .save-btn, .mood-btn, select, input, textarea, .btn-icon,
+      .card, .streak-num, .streak-banner, .advice-card, .heat-cell, .range-wrap input[type=range]::-webkit-slider-thumb,
+      .success-msg, .metric-val { transition: none !important; animation: none !important; transform: none !important; text-shadow: none !important; }
+      .streak-banner::before { display: none; }
+      .week-bar { transform: scaleY(1) !important; opacity: 1 !important; height: var(--bar-h, 4px) !important; }
+      canvas { display: none !important; }
     }
-
-    /* SCROLLBAR */
-    ::-webkit-scrollbar { width: 4px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: var(--border-hover); border-radius: 2px; }
 
     /* === DESKTOP (≥768px) === */
     @media (min-width: 768px) {
       body { max-width: 100%; }
 
-      .nav {
-        position: fixed; top: 0; left: 0; bottom: auto;
-        transform: none; width: 220px; max-width: 220px;
-        height: 100dvh; flex-direction: column;
-        border-top: none; border-right: 1px solid var(--border);
-        padding: 24px 0; justify-content: flex-start; gap: 2px;
+      /* Sidebar */
+      #sidebar-desktop {
+        display: flex; flex-direction: column;
+        position: fixed; top: 0; left: 0; bottom: 0;
+        width: 260px; max-width: 260px; height: 100dvh;
+        background: var(--bg-secondary);
+        border-right: 1px solid var(--border);
+        z-index: 100;
       }
-      .nav-btn {
+      .sidebar-header { padding: 28px 24px 20px; border-bottom: 1px solid var(--border); }
+      .sidebar-logo { display: flex; align-items: center; gap: 10px; font-size: 20px; font-weight: var(--fw-bold); color: var(--text-primary); margin-bottom: 16px; }
+      .sidebar-logo i { font-size: 24px; }
+      .sidebar-greeting-text { font-size: 14px; font-weight: var(--fw-semibold); color: var(--text-primary); }
+      .sidebar-greeting-sub { font-size: 12px; color: var(--text-secondary); margin-top: 2px; display: block; }
+      .sidebar-nav { flex: 1; padding: 12px 0; display: flex; flex-direction: column; gap: 2px; }
+      .sidebar-nav .nav-btn {
         flex-direction: row; justify-content: flex-start;
-        gap: 12px; padding: 10px 24px;
-        font-size: 13px; letter-spacing: 0;
+        gap: 12px; padding: 11px 24px;
+        font-size: 14px; letter-spacing: 0;
+        border-radius: 0; border-left: 3px solid transparent;
       }
-      .nav-btn i { font-size: 20px; }
-      .nav-btn.active { background: var(--bg-input); border-radius: 0; }
+      .sidebar-nav .nav-btn i { font-size: 20px; }
+      .sidebar-nav .nav-btn.active {
+        color: var(--accent); background: var(--bg-input);
+        border-left-color: var(--accent);
+      }
+      .sidebar-nav .nav-btn:hover:not(.active) { background: rgba(255,255,255,0.03); color: var(--text-primary); }
+      .sidebar-footer {
+        padding: 16px 24px; border-top: 1px solid var(--border);
+        display: flex; gap: 16px;
+      }
+      .sidebar-stat { flex: 1; }
+      .sidebar-stat-label { font-size: 9px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-secondary); display: block; margin-bottom: 2px; }
+      .sidebar-stat-val { font-size: 16px; font-weight: var(--fw-bold); color: var(--text-primary); }
 
-      .page { padding: 40px; margin-left: 220px; max-width: none; }
+      /* Hide mobile nav */
+      .nav { display: none; }
+
+      /* Pages */
+      .page { padding: 40px 48px; margin-left: 260px; max-width: none; }
+
+      .page-title { font-size: 28px; letter-spacing: -0.5px; }
+      .page-sub { font-size: 15px; }
 
       .metric-grid { grid-template-columns: repeat(4, 1fr); gap: 14px; }
+      .metric-val { font-size: 32px; }
 
       .streak-banner { padding: 24px 28px; }
       .streak-name { font-size: 24px; }
@@ -226,16 +343,41 @@
       .activity-icon { width: 48px; height: 48px; font-size: 24px; }
       .activity-name { font-size: 15px; }
       .btn-icon { font-size: 16px; padding: 4px 6px; }
+      .empty { padding: 48px 32px; }
     }
   </style>
 </head>
 <body>
 
+<!-- DESKTOP SIDEBAR -->
+<div id="sidebar-desktop">
+  <div class="sidebar-header">
+    <div class="sidebar-logo">
+      <i class="ti ti-run" style="color:var(--accent)"></i>AthleteLog
+    </div>
+    <div class="sidebar-greeting">
+      <div class="sidebar-greeting-text" id="sidebar-greeting-text">Ciao, Runner!</div>
+      <div class="sidebar-greeting-sub" id="sidebar-greeting-sub">Carica la tua prima uscita</div>
+    </div>
+  </div>
+  <div class="sidebar-nav">
+    <button class="nav-btn active" data-page="dashboard" type="button" aria-label="Dashboard"><i class="ti ti-layout-dashboard"></i> Dashboard</button>
+    <button class="nav-btn" data-page="log" type="button" aria-label="Aggiungi attività"><i class="ti ti-circle-plus"></i> Aggiungi</button>
+    <button class="nav-btn" data-page="history" type="button" aria-label="Storico"><i class="ti ti-list-details"></i> Storico</button>
+    <button class="nav-btn" data-page="insights" type="button" aria-label="Consigli"><i class="ti ti-bulb"></i> Consigli</button>
+  </div>
+  <div class="sidebar-footer">
+    <div class="sidebar-stat"><span class="sidebar-stat-label">Serie</span><span class="sidebar-stat-val" id="sidebar-streak">0</span></div>
+    <div class="sidebar-stat"><span class="sidebar-stat-label">Settimana</span><span class="sidebar-stat-val" id="sidebar-week">0 km</span></div>
+    <div class="sidebar-stat"><span class="sidebar-stat-label">Oggi</span><span class="sidebar-stat-val" id="sidebar-today">—</span></div>
+  </div>
+</div>
+
 <!-- DASHBOARD -->
 <div id="page-dashboard" class="page active">
   <div class="streak-banner">
     <div>
-      <div class="streak-name">Ciao, Runner! 🏃</div>
+      <div class="streak-name">Ciao, Runner!</div>
       <div class="streak-sub" id="streak-sub">Carica la tua prima uscita</div>
     </div>
     <div class="streak-num" id="streak-badge">🎯</div>
@@ -386,7 +528,7 @@
   </div>
 </div>
 
-<!-- BOTTOM NAV -->
+<!-- BOTTOM NAV (mobile) -->
 <nav class="nav">
   <button class="nav-btn active" data-page="dashboard" type="button" aria-label="Dashboard">
     <i class="ti ti-layout-dashboard"></i>Dashboard
@@ -423,10 +565,29 @@
   </div>
 </template>
 
-<template id="tpl-empty">
+<template id="tpl-empty-first">
   <div class="empty">
-    <i class="ti ti-run"></i>
-    <p>Nessuna attività ancora.<br>Aggiungi la tua prima corsa!</p>
+    <div class="empty-icon-wrap"><i class="ti ti-run"></i></div>
+    <h3 class="empty-title">Benvenuto su AthleteLog!</h3>
+    <p class="empty-desc">Non hai ancora registrato attività.<br />Inizia subito il tuo percorso sportivo.</p>
+    <button class="save-btn" data-action="go-log" type="button" style="width:auto;padding:12px 24px"><i class="ti ti-circle-plus"></i> Prima attività</button>
+  </div>
+</template>
+
+<template id="tpl-empty-week">
+  <div class="empty">
+    <div class="empty-icon-wrap empty-icon-orange"><i class="ti ti-calendar-off"></i></div>
+    <h3 class="empty-title">Nessuna attività questa settimana</h3>
+    <p class="empty-desc">Prenditi un momento per muoverti!<br />Anche una breve sessione conta.</p>
+    <button class="save-btn" data-action="go-log" type="button" style="width:auto;padding:12px 24px;background:var(--accent-orange);color:#1a0f0a"><i class="ti ti-plus"></i> Registra ora</button>
+  </div>
+</template>
+
+<template id="tpl-empty-records">
+  <div class="empty" style="padding:16px 0">
+    <div class="empty-icon-wrap" style="width:48px;height:48px"><i class="ti ti-trophy-off" style="font-size:22px"></i></div>
+    <h3 class="empty-title" style="font-size:15px">Ancora nessun record</h3>
+    <p class="empty-desc" style="font-size:13px">I tuoi primati appariranno qui dopo ogni allenamento.</p>
   </div>
 </template>
 
@@ -441,11 +602,12 @@
   const DAYS_MIN = ['L', 'M', 'M', 'G', 'V', 'S', 'D'];
   const MS_PER_DAY = 86400000;
   const STREAK_FIRE = 7;
+  const STREAK_MILESTONES = [7, 14, 21, 30, 60, 90];
   const RECENT_COUNT = 5;
   const BAD_MOOD_WINDOW = 10;
   const BAR_HEIGHT_MAX = 72;
   const PROGRESSION_FACTOR = 1.1;
-  const PALETTE = ['#5adf7c', '#3aaf5c', '#fac775', '#f0997b', '#85b7eb', '#d4537e', '#7f77dd'];
+  const PALETTE = ['#5adf7c', '#3aaf5c', '#fac775', '#f0997b', '#85b7eb', '#4fc3f7', '#b388ff'];
 
   // ===== DATA LAYER =====
   const Store = {
@@ -479,72 +641,135 @@
   function todayStr() {
     return new Date().toISOString().split('T')[0];
   }
-
   function dateFromStr(s) {
     return new Date(s + 'T00:00:00');
   }
-
   function todayMidnight() {
     const d = new Date();
     d.setHours(0, 0, 0, 0);
     return d;
   }
-
   function daysBetween(a, b) {
     return Math.round((a - b) / MS_PER_DAY);
   }
-
   function sportName(sport) {
     const idx = sport.indexOf(' ');
     return idx > -1 ? sport.substring(idx + 1) : sport;
   }
-
   function sportEmoji(sport) {
     const idx = sport.indexOf(' ');
     return idx > -1 ? sport.substring(0, idx) : '';
   }
-
   function formatDate(d) {
-    return d.toLocaleDateString('it-IT', {
-      day: '2-digit', month: 'short', year: '2-digit'
-    });
+    return d.toLocaleDateString('it-IT', { day: '2-digit', month: 'short', year: '2-digit' });
   }
-
   function calcCalories(duration, intensity) {
     return duration * CAL_PER_MIN[intensity];
   }
-
   function intensityName(val) {
     return INTENSITY_LABELS[Math.min(Math.max(+val || 2, 1), 4)];
   }
-
   function intensityBadge(val) {
     return INTENSITY_BADGES[Math.min(Math.max(+val || 2, 1), 4)];
   }
-
   function clampIntensity(val) {
     return Math.min(Math.max(+val || 2, 1), 4);
   }
-
   function showError(msg) {
     const el = document.getElementById('form-error');
     document.getElementById('error-text').textContent = msg;
     el.style.display = 'flex';
-    setTimeout(() => el.style.display = 'none', 4000);
+    setTimeout(function() { el.style.display = 'none'; }, 4000);
   }
-
   function hideError() {
     document.getElementById('form-error').style.display = 'none';
   }
 
-  function hideSuccess() {
-    document.getElementById('success-msg').style.display = 'none';
+  // ===== ANIMATIONS =====
+  function launchConfetti(originX, originY) {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const canvas = document.createElement('canvas');
+    canvas.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:9999';
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    document.body.appendChild(canvas);
+    const ctx = canvas.getContext('2d');
+    const colors = ['#5adf7c', '#fac775', '#f0997b', '#85b7eb', '#4fc3f7'];
+    const pieces = [];
+    for (let i = 0; i < 60; i++) {
+      pieces.push({
+        x: originX * canvas.width,
+        y: originY * canvas.height,
+        vx: (Math.random() - 0.5) * 18,
+        vy: -Math.random() * 16 - 4,
+        w: Math.random() * 7 + 3,
+        h: Math.random() * 5 + 2,
+        color: colors[Math.random() * colors.length | 0],
+        rot: Math.random() * 360,
+        rotV: (Math.random() - 0.5) * 8,
+        gravity: 0.3 + Math.random() * 0.15
+      });
+    }
+    let frame;
+    function draw() {
+      let alive = false;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (const p of pieces) {
+        p.x += p.vx;
+        p.vy += p.gravity;
+        p.y += p.vy;
+        p.rot += p.rotV;
+        if (p.y < canvas.height + 20) {
+          alive = true;
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.rot * Math.PI / 180);
+          ctx.fillStyle = p.color;
+          ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+          ctx.restore();
+        }
+      }
+      if (alive) frame = requestAnimationFrame(draw);
+      else { canvas.remove(); cancelAnimationFrame(frame); }
+    }
+    draw();
   }
 
-  function showSuccess(msg) {
-    document.getElementById('success-text').textContent = msg;
-    document.getElementById('success-msg').style.display = 'flex';
-    setTimeout(hideSuccess, 3000);
+  function createRipple(e, el) {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const rect = el.getBoundingClientRect();
+    const ripple = document.createElement('span');
+    ripple.className = 'ripple';
+    const size = Math.max(rect.width, rect.height);
+    ripple.style.width = ripple.style.height = size + 'px';
+    ripple.style.left = (e.clientX - rect.left - size / 2) + 'px';
+    ripple.style.top = (e.clientY - rect.top - size / 2) + 'px';
+    el.appendChild(ripple);
+    ripple.addEventListener('animationend', function() { ripple.remove(); });
+  }
+
+  function animateWeekBars() {
+    const bars = document.querySelectorAll('.week-bar');
+    if (!bars.length || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      bars.forEach(function(b) {
+        b.style.height = b.getAttribute('data-target-height') + 'px';
+        if (+b.getAttribute('data-target-height') > 4) b.classList.add('active');
+      });
+      return;
+    }
+    bars.forEach(function(bar, i) {
+      const targetH = bar.getAttribute('data-target-height') || 4;
+      bar.style.setProperty('--bar-h', targetH + 'px');
+      bar.style.animationDelay = (i * 80) + 'ms';
+      setTimeout(function() {
+        bar.classList.add('animate');
+        if (+targetH > 4) bar.classList.add('active');
+      }, i * 80);
+    });
+  }
+
+  function checkStreakMilestone(streak) {
+    return STREAK_MILESTONES.indexOf(streak);
   }
 
   // ===== STREAK =====
@@ -572,10 +797,10 @@
     root.setAttribute('data-id', activity.id);
     clone.querySelector('.activity-icon').textContent = sportEmoji(activity.sport) || '🏃';
     clone.querySelector('.activity-name').textContent = sportName(activity.sport);
-    const metaParts = [activity.duration + ' min'];
-    if (activity.distance > 0) metaParts.push(activity.distance.toFixed(1) + ' km');
-    metaParts.push(calcCalories(activity.duration, activity.intensity) + ' kcal');
-    clone.querySelector('.activity-meta').textContent = metaParts.join(' · ');
+    const meta = [activity.duration + ' min'];
+    if (activity.distance > 0) meta.push(activity.distance.toFixed(1) + ' km');
+    meta.push(calcCalories(activity.duration, activity.intensity) + ' kcal');
+    clone.querySelector('.activity-meta').textContent = meta.join(' · ');
     const badge = clone.querySelector('.badge');
     badge.textContent = intensityName(activity.intensity);
     badge.className = 'badge ' + intensityBadge(activity.intensity);
@@ -590,16 +815,16 @@
     return clone;
   }
 
-  function emptyActivityElement() {
-    return document.getElementById('tpl-empty').content.cloneNode(true);
-  }
-
   // ===== NAVIGATION =====
   function showPage(id, btn) {
     document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
     document.querySelectorAll('.nav-btn').forEach(function(b) { b.classList.remove('active'); });
     var pageEl = document.getElementById('page-' + id);
-    if (pageEl) pageEl.classList.add('active');
+    if (pageEl) {
+      pageEl.classList.remove('active');
+      void pageEl.offsetWidth;
+      pageEl.classList.add('active');
+    }
     if (btn) btn.classList.add('active');
     if (id === 'log') resetForm();
     if (id === 'dashboard') renderDashboard();
@@ -629,6 +854,10 @@
     document.getElementById('intensity-label').textContent = intensityName(v);
   }
 
+  function hideSuccess() {
+    document.getElementById('success-msg').classList.remove('visible');
+  }
+
   function populateForm(activity) {
     editingId = activity.id;
     document.getElementById('sport-type').value = activity.sport;
@@ -650,13 +879,19 @@
     e.preventDefault();
     hideError();
     hideSuccess();
+
+    var btn = document.querySelector('.save-btn');
+    btn.classList.add('saving');
+    btn.innerHTML = '<i class="ti ti-loader"></i> Salvataggio...';
+
     var date = document.getElementById('act-date').value;
     var durationRaw = document.getElementById('act-duration').value;
     var duration = Number(durationRaw);
-    if (!date) { showError('Inserisci una data.'); return; }
-    if (date > todayStr()) { showError('La data non può essere futura.'); return; }
-    if (!durationRaw || !Number.isInteger(duration) || duration < 1) { showError('Inserisci una durata valida (minuti, numero intero > 0).'); return; }
-    if (duration > 600) { showError('La durata non può superare 600 minuti.'); return; }
+    if (!date) { btn.classList.remove('saving'); btn.innerHTML = '<i class="ti ti-device-floppy"></i> Salva attività'; showError('Inserisci una data.'); return; }
+    if (date > todayStr()) { btn.classList.remove('saving'); btn.innerHTML = '<i class="ti ti-device-floppy"></i> Salva attività'; showError('La data non può essere futura.'); return; }
+    if (!durationRaw || !Number.isInteger(duration) || duration < 1) { btn.classList.remove('saving'); btn.innerHTML = '<i class="ti ti-device-floppy"></i> Salva attività'; showError('Inserisci una durata valida.'); return; }
+    if (duration > 600) { btn.classList.remove('saving'); btn.innerHTML = '<i class="ti ti-device-floppy"></i> Salva attività'; showError('La durata non può superare 600 minuti.'); return; }
+
     var editMode = editingId !== null;
     var activity = {
       id: editMode ? editingId : Date.now(),
@@ -668,18 +903,32 @@
       mood: selectedMood,
       notes: document.getElementById('act-notes').value.trim()
     };
+
     if (editMode) {
       var idx = activities.findIndex(function(a) { return a.id === editingId; });
       if (idx > -1) activities[idx] = activity;
     } else {
       activities.unshift(activity);
     }
-    if (!Store.save(activities)) return;
-    showSuccess(editMode ? 'Attività aggiornata con successo!' : 'Attività salvata con successo!');
-    resetForm();
+    if (!Store.save(activities)) { btn.classList.remove('saving'); btn.innerHTML = '<i class="ti ti-device-floppy"></i> Salva attività'; return; }
+
+    btn.classList.remove('saving');
+    btn.classList.add('saved');
+    btn.innerHTML = '<i class="ti ti-circle-check"></i> ' + (editMode ? 'Aggiornato!' : 'Salvato!');
+    launchConfetti(
+      (btn.getBoundingClientRect().left + btn.offsetWidth / 2) / window.innerWidth,
+      (btn.getBoundingClientRect().top + btn.offsetHeight / 2) / window.innerHeight
+    );
+
+    document.getElementById('success-text').textContent = editMode ? 'Attività aggiornata con successo!' : 'Attività salvata con successo!';
+    document.getElementById('success-msg').classList.add('visible');
+
     setTimeout(function() {
+      btn.classList.remove('saved');
+      hideSuccess();
+      resetForm();
       showPage('dashboard', document.querySelector('[data-page="dashboard"]'));
-    }, 1200);
+    }, 1800);
   }
 
   function deleteActivity(id) {
@@ -700,17 +949,42 @@
     var totalKm = activities.reduce(function(s, a) { return s + a.distance; }, 0);
     var totalMins = activities.reduce(function(s, a) { return s + a.duration; }, 0);
     var totalCal = activities.reduce(function(s, a) { return s + calcCalories(a.duration, a.intensity); }, 0);
+
+    var prevKm = parseFloat(document.getElementById('total-km').getAttribute('data-prev') || '0');
+    var prevRuns = parseInt(document.getElementById('total-runs').getAttribute('data-prev') || '0');
     document.getElementById('total-km').textContent = totalKm.toFixed(1);
+    document.getElementById('total-km').setAttribute('data-prev', totalKm);
     document.getElementById('total-runs').textContent = activities.length;
+    document.getElementById('total-runs').setAttribute('data-prev', activities.length);
     document.getElementById('total-mins').textContent = totalMins;
     document.getElementById('total-cal').textContent = totalCal;
 
+    document.querySelectorAll('.metric-val').forEach(function(el) {
+      el.classList.remove('flash');
+      void el.offsetWidth;
+      el.classList.add('flash');
+    });
+
     var streak = calcStreak();
     var badge = document.getElementById('streak-badge');
+    var banner = document.querySelector('.streak-banner');
+    banner.classList.remove('streak-zero', 'streak-fire', 'milestone');
+    badge.classList.remove('milestone', 'pop');
+
     if (streak > 0) {
-      badge.textContent = streak + ' ' + (streak >= STREAK_FIRE ? '🔥' : '⚡');
+      var icon = streak >= STREAK_FIRE ? '🔥' : '⚡';
+      badge.innerHTML = streak + ' <span class="streak-emoji">' + icon + '</span>';
+      banner.classList.add('streak-active');
+      if (streak >= STREAK_FIRE) banner.classList.add('streak-fire');
+      var mIdx = checkStreakMilestone(streak);
+      if (mIdx >= 0) {
+        badge.classList.add('milestone', 'pop');
+        banner.classList.add('milestone');
+        launchConfetti(0.5, 0.2);
+      }
     } else {
       badge.textContent = '🎯';
+      banner.classList.add('streak-zero');
     }
     document.getElementById('streak-sub').textContent = streak > 0
       ? streak + (streak === 1 ? ' giorno consecutivo' : ' giorni consecutivi')
@@ -729,24 +1003,40 @@
       }
     });
     var maxDur = Math.max.apply(null, weekDur.concat([1]));
+    var weekTotalKm = weekKm.reduce(function(s, v) { return s + v; }, 0);
+
     document.getElementById('week-bars').innerHTML = DAYS_WEEK.map(function(day, i) {
       var h = Math.round((weekDur[i] / maxDur) * BAR_HEIGHT_MAX) + 4;
       return '<div class="week-col">'
-        + '<div class="week-bar-wrap"><div class="week-bar' + (weekDur[i] > 0 ? ' active' : '') + '" style="height:' + h + 'px"></div></div>'
+        + '<div class="week-bar-wrap"><div class="week-bar' + (weekDur[i] > 0 ? '' : '') + '" data-target-height="' + h + '" style="height:0"></div></div>'
         + '<div class="week-day">' + day + '</div>'
         + '<div class="week-km">' + (weekKm[i] > 0 ? weekKm[i].toFixed(1) : '') + '</div>'
         + '</div>';
     }).join('');
+    animateWeekBars();
 
     var recentEl = document.getElementById('recent-list');
     recentEl.innerHTML = '';
     if (activities.length === 0) {
-      recentEl.appendChild(emptyActivityElement());
+      recentEl.appendChild(document.getElementById('tpl-empty-first').content.cloneNode(true));
     } else {
-      activities.slice(0, RECENT_COUNT).forEach(function(a) {
-        recentEl.appendChild(createActivityElement(a));
-      });
+      var recentWeek = activities.filter(function(a) { return daysBetween(now, dateFromStr(a.date)) < 7; });
+      if (recentWeek.length === 0) {
+        recentEl.appendChild(document.getElementById('tpl-empty-week').content.cloneNode(true));
+      } else {
+        activities.slice(0, RECENT_COUNT).forEach(function(a) {
+          recentEl.appendChild(createActivityElement(a));
+        });
+      }
     }
+
+    document.getElementById('sidebar-streak').textContent = streak > 0 ? streak + (streak >= STREAK_FIRE ? '🔥' : '⚡') : '—';
+    document.getElementById('sidebar-week').textContent = weekTotalKm.toFixed(1) + ' km';
+    document.getElementById('sidebar-today').textContent = weekDur[(now.getDay() + 6) % 7] > 0 ? '✅ ' + weekDur[(now.getDay() + 6) % 7] + 'min' : '—';
+    document.getElementById('sidebar-greeting-text').textContent = streak > 0 ? 'Serie di ' + streak + ' giorni!' : 'Ciao, Runner!';
+    document.getElementById('sidebar-greeting-sub').textContent = streak > 0
+      ? (streak >= STREAK_FIRE ? 'Stai bruciando! 🔥' : 'Continua così!')
+      : (activities.length > 0 ? 'Forza, registra oggi!' : 'Inizia ora!');
   }
 
   function renderHistory() {
@@ -763,15 +1053,13 @@
     });
     var firstDay = (new Date(year, month, 1).getDay() + 6) % 7;
     var heatHtml = '';
-    for (var i = 0; i < firstDay; i++) {
-      heatHtml += '<div class="heat-cell"></div>';
-    }
+    for (var i = 0; i < firstDay; i++) heatHtml += '<div class="heat-cell"></div>';
     var today = new Date();
     for (var d = 1; d <= daysInMonth; d++) {
       var cnt = heatData[d] || 0;
       var cls = cnt === 0 ? '' : cnt === 1 ? 'heat-1' : cnt === 2 ? 'heat-2' : 'heat-3';
       var isToday = (d === today.getDate() && month === today.getMonth() && year === today.getFullYear()) ? 'heat-today' : '';
-      heatHtml += '<div class="heat-cell ' + cls + ' ' + isToday + '" title="' + d + ' — ' + cnt + ' attività"></div>';
+      heatHtml += '<div class="heat-cell ' + cls + ' ' + isToday + '" data-tooltip="' + d + ' — ' + cnt + ' attività"></div>';
     }
     document.getElementById('heatmap').innerHTML = heatHtml;
     document.getElementById('heatmap-days-label').innerHTML = DAYS_MIN.map(function(d) {
@@ -780,14 +1068,13 @@
     document.getElementById('heat-month-label').textContent = heatmapMonth.toLocaleDateString('it-IT', { month: 'long', year: 'numeric' });
 
     var maxRun = 0;
-    activities.forEach(function(a) {
-      if (a.distance > maxRun) maxRun = a.distance;
-    });
+    activities.forEach(function(a) { if (a.distance > maxRun) maxRun = a.distance; });
     var maxDur = activities.reduce(function(m, a) { return a.duration > m ? a.duration : m; }, 0);
     var streak = calcStreak();
     var prEl = document.getElementById('pr-list');
     if (!activities.length) {
-      prEl.innerHTML = '<div class="empty" style="padding:16px 0"><p>Nessun record ancora.</p></div>';
+      prEl.innerHTML = '';
+      prEl.appendChild(document.getElementById('tpl-empty-records').content.cloneNode(true));
     } else {
       prEl.innerHTML = '<div class="pr-item"><span class="pr-label"><i class="ti ti-trophy"></i>Distanza massima</span><span class="pr-val">' + maxRun.toFixed(1) + ' km</span></div>'
         + '<div class="pr-item"><span class="pr-label"><i class="ti ti-clock"></i>Allenamento più lungo</span><span class="pr-val">' + maxDur + ' min</span></div>'
@@ -798,14 +1085,15 @@
     var allEl = document.getElementById('all-activities');
     allEl.innerHTML = '';
     if (activities.length === 0) {
-      var emptyAll = document.getElementById('tpl-empty').content.cloneNode(true);
+      var emptyAll = document.getElementById('tpl-empty-first').content.cloneNode(true);
       emptyAll.querySelector('i').className = 'ti ti-list';
-      emptyAll.querySelector('p').textContent = 'Nessuna attività ancora.';
+      emptyAll.querySelector('.empty-title').textContent = 'Nessuna attività ancora';
+      emptyAll.querySelector('.empty-desc').textContent = 'Registra la tua prima attività per iniziare.';
+      var btn = emptyAll.querySelector('button');
+      if (btn) btn.style.display = 'none';
       allEl.appendChild(emptyAll);
     } else {
-      activities.forEach(function(a) {
-        allEl.appendChild(createActivityElement(a));
-      });
+      activities.forEach(function(a) { allEl.appendChild(createActivityElement(a)); });
     }
   }
 
@@ -815,31 +1103,16 @@
       advEl.innerHTML = '<div class="advice-card"><div class="advice-header"><div class="advice-icon-wrap"><i class="ti ti-info-circle"></i></div><div><div class="advice-tag">PER INIZIARE</div></div></div><div class="advice-text">Aggiungi le tue prime attività per ricevere consigli personalizzati basati sui tuoi dati di allenamento.</div></div>';
     } else {
       var now = todayMidnight();
-      var recent7 = activities.filter(function(a) {
-        return daysBetween(now, dateFromStr(a.date)) < 7;
-      });
+      var recent7 = activities.filter(function(a) { return daysBetween(now, dateFromStr(a.date)) < 7; });
       var avgInt = recent7.length ? recent7.reduce(function(s, a) { return s + a.intensity; }, 0) / recent7.length : 0;
       var totalKm7 = recent7.reduce(function(s, a) { return s + a.distance; }, 0);
-      var badMoods = activities.slice(0, BAD_MOOD_WINDOW).filter(function(a) {
-        return a.mood === '😫' || a.mood === '😐';
-      }).length;
+      var badMoods = activities.slice(0, BAD_MOOD_WINDOW).filter(function(a) { return a.mood === '😫' || a.mood === '😐'; }).length;
       var advices = [];
-      if (recent7.length >= 4) {
-        advices.push({ icon: 'ti-refresh', tag: 'RECUPERO', text: 'Hai fatto ' + recent7.length + ' allenamenti negli ultimi 7 giorni. Ottimo ritmo! Assicurati di includere almeno un giorno di riposo completo per permettere ai muscoli di recuperare.' });
-      }
-      if (avgInt >= 3) {
-        advices.push({ icon: 'ti-heart-rate-monitor', tag: 'INTENSITÀ', text: 'L\'intensità media dei tuoi allenamenti recenti è elevata. Considera di inserire una sessione leggera o stretching per bilanciare il carico e prevenire infortuni.' });
-      }
-      if (totalKm7 > 0) {
-        var nextTarget = (totalKm7 * PROGRESSION_FACTOR).toFixed(1);
-        advices.push({ icon: 'ti-trending-up', tag: 'PROGRESSIONE', text: 'Questa settimana hai percorso ' + totalKm7.toFixed(1) + ' km. Per migliorare in modo graduale e sicuro, la prossima settimana puoi provare a raggiungere ' + nextTarget + ' km (+10%).' });
-      }
-      if (badMoods >= 3) {
-        advices.push({ icon: 'ti-moon', tag: 'BENESSERE', text: 'In alcuni allenamenti recenti il tuo umore post-workout era basso. Controlla il riposo notturno e valuta di ridurre l\'intensità per qualche giorno.' });
-      }
-      if (!advices.length) {
-        advices.push({ icon: 'ti-star', tag: 'OTTIMO LAVORO', text: 'Stai andando alla grande! Continua a registrare le tue attività per ricevere consigli sempre più precisi e personalizzati.' });
-      }
+      if (recent7.length >= 4) advices.push({ icon: 'ti-refresh', tag: 'RECUPERO', text: 'Hai fatto ' + recent7.length + ' allenamenti negli ultimi 7 giorni. Ottimo ritmo! Assicurati di includere almeno un giorno di riposo completo.' });
+      if (avgInt >= 3) advices.push({ icon: 'ti-heart-rate-monitor', tag: 'INTENSITÀ', text: 'L\'intensità media dei tuoi allenamenti recenti è elevata. Considera di inserire una sessione leggera o stretching per bilanciare il carico.' });
+      if (totalKm7 > 0) advices.push({ icon: 'ti-trending-up', tag: 'PROGRESSIONE', text: 'Questa settimana hai percorso ' + totalKm7.toFixed(1) + ' km. Per migliorare in modo graduale, la prossima settimana punta a ' + (totalKm7 * PROGRESSION_FACTOR).toFixed(1) + ' km (+10%).' });
+      if (badMoods >= 3) advices.push({ icon: 'ti-moon', tag: 'BENESSERE', text: 'In alcuni allenamenti recenti il tuo umore post-workout era basso. Controlla il riposo notturno e valuta di ridurre l\'intensità per qualche giorno.' });
+      if (!advices.length) advices.push({ icon: 'ti-star', tag: 'OTTIMO LAVORO', text: 'Stai andando alla grande! Continua a registrare le tue attività per ricevere consigli sempre più precisi.' });
       advEl.innerHTML = advices.map(function(a) {
         return '<div class="advice-card"><div class="advice-header"><div class="advice-icon-wrap"><i class="ti ' + a.icon + '"></i></div><div><div class="advice-tag">' + a.tag + '</div></div></div><div class="advice-text">' + a.text + '</div></div>';
       }).join('');
@@ -850,35 +1123,15 @@
       var name = sportName(a.sport);
       sportMins[name] = (sportMins[name] || 0) + a.duration;
     });
-    if (sportChart) {
-      sportChart.destroy();
-      sportChart = null;
-    }
+    if (sportChart) { sportChart.destroy(); sportChart = null; }
     var labels = Object.keys(sportMins);
     var donutEmpty = document.getElementById('donut-empty');
     if (labels.length) {
       donutEmpty.style.display = 'none';
       sportChart = new Chart(document.getElementById('sport-chart'), {
         type: 'doughnut',
-        data: {
-          labels: labels,
-          datasets: [{
-            data: Object.values(sportMins),
-            backgroundColor: labels.map(function(_, i) { return PALETTE[i % PALETTE.length]; }),
-            borderWidth: 2,
-            borderColor: '#1e2130'
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              position: 'bottom',
-              labels: { color: '#8b90a8', font: { size: 12 }, padding: 14, boxWidth: 12, boxHeight: 12 }
-            }
-          }
-        }
+        data: { labels: labels, datasets: [{ data: Object.values(sportMins), backgroundColor: labels.map(function(_, i) { return PALETTE[i % PALETTE.length]; }), borderWidth: 2, borderColor: '#1e2130' }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#8b90a8', font: { size: 12 }, padding: 14, boxWidth: 12, boxHeight: 12 } } } }
       });
     } else {
       donutEmpty.style.display = 'flex';
@@ -887,13 +1140,19 @@
 
   // ===== EVENT HANDLERS =====
   document.addEventListener('DOMContentLoaded', function() {
-    // Nav delegation
-    document.querySelector('.nav').addEventListener('click', function(e) {
-      var btn = e.target.closest('.nav-btn');
-      if (btn) showPage(btn.getAttribute('data-page'), btn);
-    });
+    function setupNavListeners(container) {
+      container.addEventListener('click', function(e) {
+        var btn = e.target.closest('.nav-btn');
+        if (!btn) return;
+        if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          createRipple(e, btn);
+        }
+        showPage(btn.getAttribute('data-page'), btn);
+      });
+    }
+    setupNavListeners(document.querySelector('.nav'));
+    setupNavListeners(document.querySelector('.sidebar-nav'));
 
-    // Mood delegation
     document.getElementById('mood-row').addEventListener('click', function(e) {
       var btn = e.target.closest('.mood-btn');
       if (!btn) return;
@@ -902,45 +1161,35 @@
       selectedMood = btn.getAttribute('data-mood');
     });
 
-    // Intensity slider
     document.getElementById('act-intensity').addEventListener('input', function() {
       updateIntensity(this.value);
     });
 
-    // Form submit
     document.getElementById('activity-form').addEventListener('submit', saveActivity);
 
-    // Activity actions delegation (recent list)
-    document.getElementById('recent-list').addEventListener('click', function(e) {
-      var btn = e.target.closest('[data-action]');
-      if (!btn) return;
-      var item = btn.closest('[data-id]');
-      if (!item) return;
-      var id = parseInt(item.getAttribute('data-id'));
-      if (btn.getAttribute('data-action') === 'edit') {
-        var act = activities.find(function(a) { return a.id === id; });
-        if (act) populateForm(act);
-      } else if (btn.getAttribute('data-action') === 'delete') {
-        deleteActivity(id);
-      }
-    });
+    function setupActionDelegation(containerId) {
+      document.getElementById(containerId).addEventListener('click', function(e) {
+        var btn = e.target.closest('[data-action]');
+        if (!btn) return;
+        var action = btn.getAttribute('data-action');
+        if (action === 'go-log') {
+          showPage('log', document.querySelector('[data-page="log"]'));
+          return;
+        }
+        var item = btn.closest('[data-id]');
+        if (!item) return;
+        var id = parseInt(item.getAttribute('data-id'));
+        if (action === 'edit') {
+          var act = activities.find(function(a) { return a.id === id; });
+          if (act) populateForm(act);
+        } else if (action === 'delete') {
+          deleteActivity(id);
+        }
+      });
+    }
+    setupActionDelegation('recent-list');
+    setupActionDelegation('all-activities');
 
-    // Activity actions delegation (all activities list)
-    document.getElementById('all-activities').addEventListener('click', function(e) {
-      var btn = e.target.closest('[data-action]');
-      if (!btn) return;
-      var item = btn.closest('[data-id]');
-      if (!item) return;
-      var id = parseInt(item.getAttribute('data-id'));
-      if (btn.getAttribute('data-action') === 'edit') {
-        var act = activities.find(function(a) { return a.id === id; });
-        if (act) populateForm(act);
-      } else if (btn.getAttribute('data-action') === 'delete') {
-        deleteActivity(id);
-      }
-    });
-
-    // Heatmap navigation
     document.getElementById('heat-prev').addEventListener('click', function() {
       heatmapMonth.setMonth(heatmapMonth.getMonth() - 1);
       renderHistory();
@@ -950,7 +1199,6 @@
       renderHistory();
     });
 
-    // Init
     activities = Store.load();
     document.getElementById('act-date').value = todayStr();
     document.getElementById('act-date').setAttribute('max', todayStr());
