@@ -1552,7 +1552,11 @@
           else if (volDelta < -20) advText += ' Settimana di scarico? A volte il recupero è parte del progresso.';
           else advText += ' Buona costanza! Per crescere, punta a un +5-10% a settimana.';
           advices.push({ icon: 'ti-weight', tag: 'PALESTRA', text: advText });
+        } else {
+          advices.push({ icon: 'ti-info-circle', tag: 'PALESTRA', text: 'Hai registrato attività in palestra ma senza esercizi. Aggiungi serie, ripetizioni e pesi per ricevere consigli sul volume di allenamento.' });
         }
+      } else if (activities.some(function(a) { return a.sport.indexOf('Palestra') > -1; })) {
+        advices.push({ icon: 'ti-calendar-off', tag: 'PALESTRA', text: 'Non hai registrato palestra questa settimana. Mantieni la frequenza per non perdere i progressi!' });
       }
       if (badMoods >= 3) advices.push({ icon: 'ti-moon', tag: 'BENESSERE', text: 'In alcuni allenamenti recenti il tuo umore post-workout era basso. Controlla il riposo notturno e valuta di ridurre l\'intensità per qualche giorno.' });
       if (!advices.length) advices.push({ icon: 'ti-star', tag: 'OTTIMO LAVORO', text: 'Stai andando alla grande! Continua a registrare le tue attività per ricevere consigli sempre più precisi.' });
