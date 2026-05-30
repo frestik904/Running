@@ -20,6 +20,8 @@
       --radius-sm: 8px;
       --radius-md: 12px;
       --radius-lg: 16px;
+      --on-accent: #0a1a12;
+      --danger: #e24b4a;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { height: 100%; background: var(--bg-primary); color: var(--text-primary); font-family: -apple-system, 'Segoe UI', sans-serif; }
@@ -58,14 +60,22 @@
     .metric-unit { font-size: 13px; font-weight: 400; color: var(--text-secondary); }
 
     /* ACTIVITY ITEMS */
-    .activity-item { display: flex; align-items: center; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--border); }
+    .activity-item { display: flex; align-items: flex-start; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--border); }
     .activity-item:last-child { border-bottom: none; }
     .activity-icon { width: 42px; height: 42px; border-radius: var(--radius-sm); background: var(--bg-input); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+    .activity-icon i { font-size: 20px; }
     .activity-name { font-size: 14px; font-weight: 600; }
     .activity-meta { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+    .activity-notes { font-size: 12px; color: var(--text-secondary); margin-top: 4px; line-height: 1.4; font-style: italic; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
     .activity-right { margin-left: auto; text-align: right; flex-shrink: 0; }
     .activity-mood { font-size: 18px; }
     .activity-date { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+
+    /* ACTIVITY ACTIONS */
+    .activity-actions { display: flex; gap: 2px; margin-top: 4px; justify-content: flex-end; }
+    .btn-icon { background: none; border: none; cursor: pointer; color: var(--text-secondary); padding: 4px; border-radius: 4px; font-size: 14px; transition: color 0.15s, background 0.15s; }
+    .btn-icon:hover { color: var(--accent); background: var(--bg-input); }
+    .btn-icon.btn-danger:hover { color: var(--danger); }
 
     /* BADGES */
     .badge { display: inline-block; font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 99px; margin-top: 4px; }
@@ -109,10 +119,13 @@
     .mood-btn.selected { border-color: var(--accent); background: var(--accent-dim); }
 
     /* SAVE BTN */
-    .save-btn { width: 100%; padding: 15px; background: var(--accent); color: #0a1a12; border: none; border-radius: var(--radius-md); font-size: 15px; font-weight: 700; cursor: pointer; margin-top: 4px; transition: opacity 0.15s, transform 0.1s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .save-btn { width: 100%; padding: 15px; background: var(--accent); color: var(--on-accent); border: none; border-radius: var(--radius-md); font-size: 15px; font-weight: 700; cursor: pointer; margin-top: 4px; transition: opacity 0.15s, transform 0.1s; display: flex; align-items: center; justify-content: center; gap: 8px; }
     .save-btn:hover { opacity: 0.9; }
     .save-btn:active { transform: scale(0.98); }
+
+    /* MESSAGES */
     .success-msg { display: none; align-items: center; gap: 10px; color: var(--accent); background: var(--accent-dim); border: 1px solid rgba(90,223,124,0.2); border-radius: var(--radius-sm); padding: 12px 14px; margin-top: 12px; font-size: 14px; font-weight: 500; }
+    .error-msg { display: none; align-items: center; gap: 10px; color: var(--danger); background: rgba(224,75,74,0.12); border: 1px solid rgba(224,75,74,0.2); border-radius: var(--radius-sm); padding: 12px 14px; margin-top: 12px; font-size: 14px; font-weight: 500; }
 
     /* HEATMAP */
     .heatmap-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-top: 8px; }
@@ -123,6 +136,7 @@
     .heat-today { outline: 2px solid var(--accent); outline-offset: 1px; }
     .heatmap-legend { display: flex; align-items: center; gap: 6px; margin-top: 10px; font-size: 11px; color: var(--text-secondary); }
     .heatmap-legend span { width: 12px; height: 12px; border-radius: 2px; display: inline-block; }
+    .heatmap-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
 
     /* PR */
     .pr-item { display: flex; align-items: center; justify-content: space-between; padding: 11px 0; border-bottom: 1px solid var(--border); }
@@ -141,11 +155,23 @@
 
     /* DONUT */
     .donut-wrap { position: relative; height: 200px; margin-top: 8px; }
+    .donut-empty { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: var(--text-secondary); font-size: 14px; }
 
     /* EMPTY STATE */
     .empty { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 32px 16px; gap: 10px; color: var(--text-secondary); text-align: center; }
     .empty i { font-size: 44px; opacity: 0.3; }
     .empty p { font-size: 14px; line-height: 1.5; }
+
+    /* LABEL */
+    #intensity-label { color: var(--accent); }
+
+    /* FOCUS */
+    button:focus-visible, select:focus-visible, input:focus-visible, textarea:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+    /* REDUCED MOTION */
+    @media (prefers-reduced-motion: reduce) {
+      .week-bar, .nav-btn, .save-btn, .mood-btn, select, input, textarea, .btn-icon { transition: none; }
+    }
 
     /* SCROLLBAR */
     ::-webkit-scrollbar { width: 4px; }
@@ -199,6 +225,7 @@
       .activity-item { padding: 13px 0; }
       .activity-icon { width: 48px; height: 48px; font-size: 24px; }
       .activity-name { font-size: 15px; }
+      .btn-icon { font-size: 16px; padding: 4px 6px; }
     }
   </style>
 </head>
@@ -240,9 +267,7 @@
 
   <div class="card">
     <div class="card-label">Attività recenti</div>
-    <div id="recent-list">
-      <div class="empty"><i class="ti ti-run"></i><p>Nessuna attività ancora.<br>Aggiungi la tua prima corsa!</p></div>
-    </div>
+    <div id="recent-list"></div>
   </div>
 </div>
 
@@ -253,58 +278,63 @@
     <div class="page-sub">Registra il tuo allenamento</div>
   </div>
   <div class="card">
-    <div class="form-group">
-      <label class="form-label">Sport</label>
-      <select id="sport-type">
-        <option value="🏃 Running">🏃 Running</option>
-        <option value="🚴 Ciclismo">🚴 Ciclismo</option>
-        <option value="🏋️ Palestra">🏋️ Palestra</option>
-        <option value="🏊 Nuoto">🏊 Nuoto</option>
-        <option value="⚽ Calcio">⚽ Calcio</option>
-        <option value="🧘 Yoga">🧘 Yoga</option>
-        <option value="🥊 Boxe">🥊 Boxe</option>
-      </select>
-    </div>
-    <div class="form-row">
+    <form id="activity-form" autocomplete="off">
       <div class="form-group">
-        <label class="form-label">Data</label>
-        <input type="date" id="act-date" />
+        <label class="form-label" for="sport-type">Sport</label>
+        <select id="sport-type">
+          <option value="🏃 Running">🏃 Running</option>
+          <option value="🚴 Ciclismo">🚴 Ciclismo</option>
+          <option value="🏋️ Palestra">🏋️ Palestra</option>
+          <option value="🏊 Nuoto">🏊 Nuoto</option>
+          <option value="⚽ Calcio">⚽ Calcio</option>
+          <option value="🧘 Yoga">🧘 Yoga</option>
+          <option value="🥊 Boxe">🥊 Boxe</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="act-date">Data</label>
+          <input type="date" id="act-date" max="" />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="act-duration">Durata (min)</label>
+          <input type="number" id="act-duration" min="1" max="600" placeholder="45" />
+        </div>
       </div>
       <div class="form-group">
-        <label class="form-label">Durata (min)</label>
-        <input type="number" id="act-duration" min="1" max="600" placeholder="45" />
+        <label class="form-label" for="act-distance">Distanza (km, opzionale)</label>
+        <input type="number" id="act-distance" min="0" step="0.1" placeholder="5.5" />
       </div>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Distanza (km, opzionale)</label>
-      <input type="number" id="act-distance" min="0" step="0.1" placeholder="5.5" />
-    </div>
-    <div class="form-group">
-      <label class="form-label">Intensità — <strong id="intensity-label" style="color:var(--accent)">Media</strong></label>
-      <div class="range-wrap">
-        <input type="range" min="1" max="4" step="1" value="2" id="act-intensity" oninput="updateIntensity(this.value)" />
-        <div class="intensity-labels"><span>Facile</span><span>Media</span><span>Difficile</span><span>Massima</span></div>
+      <div class="form-group">
+        <label class="form-label">Intensità — <strong id="intensity-label">Media</strong></label>
+        <div class="range-wrap">
+          <input type="range" min="1" max="4" step="1" value="2" id="act-intensity" aria-label="Intensità dell'allenamento" />
+          <div class="intensity-labels"><span>Facile</span><span>Media</span><span>Difficile</span><span>Massima</span></div>
+        </div>
       </div>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Umore post-allenamento</label>
-      <div class="mood-row" id="mood-row">
-        <button class="mood-btn" onclick="selectMood(this,'😫')">😫</button>
-        <button class="mood-btn" onclick="selectMood(this,'😐')">😐</button>
-        <button class="mood-btn selected" onclick="selectMood(this,'😊')">😊</button>
-        <button class="mood-btn" onclick="selectMood(this,'💪')">💪</button>
-        <button class="mood-btn" onclick="selectMood(this,'🔥')">🔥</button>
+      <div class="form-group">
+        <label class="form-label">Umore post-allenamento</label>
+        <div class="mood-row" id="mood-row">
+          <button class="mood-btn" type="button" data-mood="😫" aria-label="Umore: molto negativo">😫</button>
+          <button class="mood-btn" type="button" data-mood="😐" aria-label="Umore: neutro">😐</button>
+          <button class="mood-btn selected" type="button" data-mood="😊" aria-label="Umore: positivo">😊</button>
+          <button class="mood-btn" type="button" data-mood="💪" aria-label="Umore: determinato">💪</button>
+          <button class="mood-btn" type="button" data-mood="🔥" aria-label="Umore: energico">🔥</button>
+        </div>
       </div>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Note (opzionale)</label>
-      <textarea id="act-notes" placeholder="Com'è andata? Percorso, sensazioni..."></textarea>
-    </div>
-    <button class="save-btn" onclick="saveActivity()">
-      <i class="ti ti-device-floppy"></i> Salva attività
-    </button>
+      <div class="form-group">
+        <label class="form-label" for="act-notes">Note (opzionale)</label>
+        <textarea id="act-notes" placeholder="Com'è andata? Percorso, sensazioni..."></textarea>
+      </div>
+      <button class="save-btn" type="submit">
+        <i class="ti ti-device-floppy"></i> Salva attività
+      </button>
+    </form>
     <div class="success-msg" id="success-msg">
-      <i class="ti ti-circle-check" style="font-size:20px"></i> Attività salvata con successo!
+      <i class="ti ti-circle-check" style="font-size:20px"></i> <span id="success-text">Attività salvata con successo!</span>
+    </div>
+    <div class="error-msg" id="form-error">
+      <i class="ti ti-alert-circle" style="font-size:20px"></i> <span id="error-text"></span>
     </div>
   </div>
 </div>
@@ -317,6 +347,11 @@
   </div>
   <div class="card">
     <div class="card-label">Heatmap mensile</div>
+    <div class="heatmap-nav">
+      <button class="btn-icon" id="heat-prev" aria-label="Mese precedente"><i class="ti ti-chevron-left"></i></button>
+      <span id="heat-month-label" style="font-size:13px;color:var(--text-secondary)"></span>
+      <button class="btn-icon" id="heat-next" aria-label="Mese successivo"><i class="ti ti-chevron-right"></i></button>
+    </div>
     <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-secondary);margin-bottom:4px" id="heatmap-days-label"></div>
     <div class="heatmap-grid" id="heatmap"></div>
     <div class="heatmap-legend">
@@ -330,11 +365,11 @@
   </div>
   <div class="card">
     <div class="card-label">Record personali</div>
-    <div id="pr-list"><div class="empty" style="padding:16px 0"><p>Nessun record ancora.</p></div></div>
+    <div id="pr-list"></div>
   </div>
   <div class="card">
     <div class="card-label">Tutte le attività</div>
-    <div id="all-activities"><div class="empty"><i class="ti ti-list"></i><p>Nessuna attività ancora.</p></div></div>
+    <div id="all-activities"></div>
   </div>
 </div>
 
@@ -347,236 +382,581 @@
   <div id="advice-list"></div>
   <div class="card">
     <div class="card-label">Sport per tempo (minuti)</div>
-    <div class="donut-wrap"><canvas id="sport-chart" role="img" aria-label="Grafico distribuzione sport"></canvas></div>
+    <div class="donut-wrap"><canvas id="sport-chart" role="img" aria-label="Grafico distribuzione sport"></canvas><div class="donut-empty" id="donut-empty">Nessun dato disponibile</div></div>
   </div>
 </div>
 
 <!-- BOTTOM NAV -->
 <nav class="nav">
-  <button class="nav-btn active" onclick="showPage('dashboard',this)">
+  <button class="nav-btn active" data-page="dashboard" type="button" aria-label="Dashboard">
     <i class="ti ti-layout-dashboard"></i>Dashboard
   </button>
-  <button class="nav-btn" onclick="showPage('log',this)">
+  <button class="nav-btn" data-page="log" type="button" aria-label="Aggiungi attività">
     <i class="ti ti-circle-plus"></i>Aggiungi
   </button>
-  <button class="nav-btn" onclick="showPage('history',this)">
+  <button class="nav-btn" data-page="history" type="button" aria-label="Storico">
     <i class="ti ti-list-details"></i>Storico
   </button>
-  <button class="nav-btn" onclick="showPage('insights',this)">
+  <button class="nav-btn" data-page="insights" type="button" aria-label="Consigli">
     <i class="ti ti-bulb"></i>Consigli
   </button>
 </nav>
 
+<!-- TEMPLATES -->
+<template id="tpl-activity">
+  <div class="activity-item">
+    <div class="activity-icon"></div>
+    <div style="min-width:0">
+      <div class="activity-name"></div>
+      <div class="activity-meta"></div>
+      <span class="badge"></span>
+      <div class="activity-notes"></div>
+    </div>
+    <div class="activity-right">
+      <div class="activity-mood"></div>
+      <div class="activity-date"></div>
+      <div class="activity-actions">
+        <button class="btn-icon" data-action="edit" type="button" aria-label="Modifica"><i class="ti ti-edit"></i></button>
+        <button class="btn-icon btn-danger" data-action="delete" type="button" aria-label="Elimina"><i class="ti ti-trash"></i></button>
+      </div>
+    </div>
+  </div>
+</template>
+
+<template id="tpl-empty">
+  <div class="empty">
+    <i class="ti ti-run"></i>
+    <p>Nessuna attività ancora.<br>Aggiungi la tua prima corsa!</p>
+  </div>
+</template>
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script>
-  let activities = JSON.parse(localStorage.getItem('athletelog_v2') || '[]');
+  // ===== CONFIGURATION =====
+  const STORAGE_KEY = 'athletelog_v2';
+  const INTENSITY_LABELS = ['', 'Facile', 'Media', 'Difficile', 'Massima'];
+  const INTENSITY_BADGES = ['', 'badge-easy', 'badge-medium', 'badge-hard', 'badge-max'];
+  const CAL_PER_MIN = [0, 7, 9, 11, 14];
+  const DAYS_WEEK = ['Lu', 'Ma', 'Me', 'Gi', 'Ve', 'Sa', 'Do'];
+  const DAYS_MIN = ['L', 'M', 'M', 'G', 'V', 'S', 'D'];
+  const MS_PER_DAY = 86400000;
+  const STREAK_FIRE = 7;
+  const RECENT_COUNT = 5;
+  const BAD_MOOD_WINDOW = 10;
+  const BAR_HEIGHT_MAX = 72;
+  const PROGRESSION_FACTOR = 1.1;
+  const PALETTE = ['#5adf7c', '#3aaf5c', '#fac775', '#f0997b', '#85b7eb', '#d4537e', '#7f77dd'];
+
+  // ===== DATA LAYER =====
+  const Store = {
+    load() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        return raw ? JSON.parse(raw) : [];
+      } catch {
+        return [];
+      }
+    },
+    save(data) {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        return true;
+      } catch {
+        showError('Spazio di archiviazione esaurito. Impossibile salvare.');
+        return false;
+      }
+    }
+  };
+
+  // ===== STATE =====
+  let activities = [];
   let selectedMood = '😊';
+  let editingId = null;
   let sportChart = null;
+  let heatmapMonth = new Date();
 
-  const intLabels = ['','Facile','Media','Difficile','Massima'];
-  const intBadge = ['','badge-easy','badge-medium','badge-hard','badge-max'];
-  const calPerMin = [0, 7, 9, 11, 14];
+  // ===== UTILITIES =====
+  function todayStr() {
+    return new Date().toISOString().split('T')[0];
+  }
 
+  function dateFromStr(s) {
+    return new Date(s + 'T00:00:00');
+  }
+
+  function todayMidnight() {
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
+    return d;
+  }
+
+  function daysBetween(a, b) {
+    return Math.round((a - b) / MS_PER_DAY);
+  }
+
+  function sportName(sport) {
+    const idx = sport.indexOf(' ');
+    return idx > -1 ? sport.substring(idx + 1) : sport;
+  }
+
+  function sportEmoji(sport) {
+    const idx = sport.indexOf(' ');
+    return idx > -1 ? sport.substring(0, idx) : '';
+  }
+
+  function formatDate(d) {
+    return d.toLocaleDateString('it-IT', {
+      day: '2-digit', month: 'short', year: '2-digit'
+    });
+  }
+
+  function calcCalories(duration, intensity) {
+    return duration * CAL_PER_MIN[intensity];
+  }
+
+  function intensityName(val) {
+    return INTENSITY_LABELS[Math.min(Math.max(+val || 2, 1), 4)];
+  }
+
+  function intensityBadge(val) {
+    return INTENSITY_BADGES[Math.min(Math.max(+val || 2, 1), 4)];
+  }
+
+  function clampIntensity(val) {
+    return Math.min(Math.max(+val || 2, 1), 4);
+  }
+
+  function showError(msg) {
+    const el = document.getElementById('form-error');
+    document.getElementById('error-text').textContent = msg;
+    el.style.display = 'flex';
+    setTimeout(() => el.style.display = 'none', 4000);
+  }
+
+  function hideError() {
+    document.getElementById('form-error').style.display = 'none';
+  }
+
+  function hideSuccess() {
+    document.getElementById('success-msg').style.display = 'none';
+  }
+
+  function showSuccess(msg) {
+    document.getElementById('success-text').textContent = msg;
+    document.getElementById('success-msg').style.display = 'flex';
+    setTimeout(hideSuccess, 3000);
+  }
+
+  // ===== STREAK =====
+  function calcStreak() {
+    if (!activities.length) return 0;
+    const dates = [...new Set(activities.map(function(a) { return a.date; }))].sort().reverse();
+    if (!dates.length) return 0;
+    let streak = 0;
+    let curDate = todayMidnight();
+    for (const d of dates) {
+      const dd = dateFromStr(d);
+      const diff = daysBetween(curDate, dd);
+      if (diff >= 0 && diff <= 1) {
+        streak++;
+        curDate = dd;
+      } else break;
+    }
+    return streak;
+  }
+
+  // ===== TEMPLATES =====
+  function createActivityElement(activity) {
+    const clone = document.getElementById('tpl-activity').content.cloneNode(true);
+    const root = clone.querySelector('.activity-item');
+    root.setAttribute('data-id', activity.id);
+    clone.querySelector('.activity-icon').textContent = sportEmoji(activity.sport) || '🏃';
+    clone.querySelector('.activity-name').textContent = sportName(activity.sport);
+    const metaParts = [activity.duration + ' min'];
+    if (activity.distance > 0) metaParts.push(activity.distance.toFixed(1) + ' km');
+    metaParts.push(calcCalories(activity.duration, activity.intensity) + ' kcal');
+    clone.querySelector('.activity-meta').textContent = metaParts.join(' · ');
+    const badge = clone.querySelector('.badge');
+    badge.textContent = intensityName(activity.intensity);
+    badge.className = 'badge ' + intensityBadge(activity.intensity);
+    const notes = clone.querySelector('.activity-notes');
+    if (activity.notes) {
+      notes.textContent = activity.notes.length > 60 ? activity.notes.slice(0, 60) + '…' : activity.notes;
+    } else {
+      notes.style.display = 'none';
+    }
+    clone.querySelector('.activity-mood').textContent = activity.mood;
+    clone.querySelector('.activity-date').textContent = formatDate(dateFromStr(activity.date));
+    return clone;
+  }
+
+  function emptyActivityElement() {
+    return document.getElementById('tpl-empty').content.cloneNode(true);
+  }
+
+  // ===== NAVIGATION =====
   function showPage(id, btn) {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById('page-' + id).classList.add('active');
-    btn.classList.add('active');
+    document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
+    document.querySelectorAll('.nav-btn').forEach(function(b) { b.classList.remove('active'); });
+    var pageEl = document.getElementById('page-' + id);
+    if (pageEl) pageEl.classList.add('active');
+    if (btn) btn.classList.add('active');
+    if (id === 'log') resetForm();
     if (id === 'dashboard') renderDashboard();
     if (id === 'history') renderHistory();
     if (id === 'insights') renderInsights();
   }
 
+  // ===== FORM =====
+  function resetForm() {
+    document.getElementById('activity-form').reset();
+    document.getElementById('act-date').value = todayStr();
+    document.getElementById('act-date').setAttribute('max', todayStr());
+    document.getElementById('act-intensity').value = '2';
+    document.getElementById('act-distance').value = '';
+    document.getElementById('act-notes').value = '';
+    updateIntensity(2);
+    selectedMood = '😊';
+    editingId = null;
+    document.querySelectorAll('.mood-btn').forEach(function(b) { b.classList.remove('selected'); });
+    document.querySelector('.mood-btn[data-mood="😊"]').classList.add('selected');
+    document.querySelector('.save-btn').innerHTML = '<i class="ti ti-device-floppy"></i> Salva attività';
+    hideError();
+    hideSuccess();
+  }
+
   function updateIntensity(v) {
-    document.getElementById('intensity-label').textContent = intLabels[v];
+    document.getElementById('intensity-label').textContent = intensityName(v);
   }
 
-  function selectMood(btn, mood) {
-    document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('selected'));
-    btn.classList.add('selected');
-    selectedMood = mood;
+  function populateForm(activity) {
+    editingId = activity.id;
+    document.getElementById('sport-type').value = activity.sport;
+    document.getElementById('act-date').value = activity.date;
+    document.getElementById('act-duration').value = activity.duration;
+    document.getElementById('act-distance').value = activity.distance || '';
+    document.getElementById('act-intensity').value = activity.intensity;
+    updateIntensity(activity.intensity);
+    selectedMood = activity.mood;
+    document.querySelectorAll('.mood-btn').forEach(function(b) { b.classList.remove('selected'); });
+    var moodBtn = document.querySelector('.mood-btn[data-mood="' + activity.mood + '"]');
+    if (moodBtn) moodBtn.classList.add('selected');
+    document.getElementById('act-notes').value = activity.notes || '';
+    document.querySelector('.save-btn').innerHTML = '<i class="ti ti-device-floppy"></i> Aggiorna attività';
+    showPage('log', document.querySelector('[data-page="log"]'));
   }
 
-  function saveActivity() {
-    const date = document.getElementById('act-date').value;
-    const duration = parseInt(document.getElementById('act-duration').value);
-    if (!date || !duration || duration < 1) { alert('Inserisci almeno data e durata.'); return; }
-    const a = {
-      id: Date.now(),
+  function saveActivity(e) {
+    e.preventDefault();
+    hideError();
+    hideSuccess();
+    var date = document.getElementById('act-date').value;
+    var durationRaw = document.getElementById('act-duration').value;
+    var duration = Number(durationRaw);
+    if (!date) { showError('Inserisci una data.'); return; }
+    if (date > todayStr()) { showError('La data non può essere futura.'); return; }
+    if (!durationRaw || !Number.isInteger(duration) || duration < 1) { showError('Inserisci una durata valida (minuti, numero intero > 0).'); return; }
+    if (duration > 600) { showError('La durata non può superare 600 minuti.'); return; }
+    var editMode = editingId !== null;
+    var activity = {
+      id: editMode ? editingId : Date.now(),
       sport: document.getElementById('sport-type').value,
-      date,
-      duration,
-      distance: parseFloat(document.getElementById('act-distance').value) || 0,
-      intensity: parseInt(document.getElementById('act-intensity').value),
+      date: date,
+      duration: duration,
+      distance: Math.max(0, parseFloat(document.getElementById('act-distance').value) || 0),
+      intensity: clampIntensity(document.getElementById('act-intensity').value),
       mood: selectedMood,
       notes: document.getElementById('act-notes').value.trim()
     };
-    activities.unshift(a);
-    localStorage.setItem('athletelog_v2', JSON.stringify(activities));
-    const msg = document.getElementById('success-msg');
-    msg.style.display = 'flex';
-    setTimeout(() => msg.style.display = 'none', 3000);
-    document.getElementById('act-duration').value = '';
-    document.getElementById('act-distance').value = '';
-    document.getElementById('act-notes').value = '';
-  }
-
-  function activityHTML(a) {
-    const emoji = a.sport.split(' ')[0];
-    const name = a.sport.substring(a.sport.indexOf(' ') + 1);
-    const d = new Date(a.date + 'T00:00:00');
-    const dateStr = d.toLocaleDateString('it-IT', { day: '2-digit', month: 'short', year: '2-digit' });
-    const cal = Math.round(a.duration * calPerMin[a.intensity]);
-    return `<div class="activity-item">
-      <div class="activity-icon">${emoji}</div>
-      <div style="min-width:0">
-        <div class="activity-name">${name}</div>
-        <div class="activity-meta">${a.duration} min${a.distance > 0 ? ' · ' + a.distance.toFixed(1) + ' km' : ''} · ${cal} kcal</div>
-        <span class="badge ${intBadge[a.intensity]}">${intLabels[a.intensity]}</span>
-      </div>
-      <div class="activity-right">
-        <div class="activity-mood">${a.mood}</div>
-        <div class="activity-date">${dateStr}</div>
-      </div>
-    </div>`;
-  }
-
-  function calcStreak() {
-    if (!activities.length) return 0;
-    const dates = [...new Set(activities.map(a => a.date))].sort().reverse();
-    let streak = 0;
-    let cur = new Date(); cur.setHours(0,0,0,0);
-    for (const d of dates) {
-      const dd = new Date(d + 'T00:00:00');
-      const diff = Math.round((cur - dd) / 86400000);
-      if (diff <= 1) { streak++; cur = dd; } else break;
+    if (editMode) {
+      var idx = activities.findIndex(function(a) { return a.id === editingId; });
+      if (idx > -1) activities[idx] = activity;
+    } else {
+      activities.unshift(activity);
     }
-    return streak;
+    if (!Store.save(activities)) return;
+    showSuccess(editMode ? 'Attività aggiornata con successo!' : 'Attività salvata con successo!');
+    resetForm();
+    setTimeout(function() {
+      showPage('dashboard', document.querySelector('[data-page="dashboard"]'));
+    }, 1200);
   }
 
+  function deleteActivity(id) {
+    if (!confirm('Eliminare questa attività definitivamente?')) return;
+    activities = activities.filter(function(a) { return a.id !== id; });
+    if (!Store.save(activities)) return;
+    var activePage = document.querySelector('.page.active');
+    if (activePage) {
+      var pageId = activePage.id.replace('page-', '');
+      if (pageId === 'dashboard') renderDashboard();
+      else if (pageId === 'history') renderHistory();
+      else if (pageId === 'insights') renderInsights();
+    }
+  }
+
+  // ===== RENDERERS =====
   function renderDashboard() {
-    const totalKm = activities.reduce((s,a) => s + a.distance, 0);
-    const totalMins = activities.reduce((s,a) => s + a.duration, 0);
-    const totalCal = activities.reduce((s,a) => s + Math.round(a.duration * calPerMin[a.intensity]), 0);
+    var totalKm = activities.reduce(function(s, a) { return s + a.distance; }, 0);
+    var totalMins = activities.reduce(function(s, a) { return s + a.duration; }, 0);
+    var totalCal = activities.reduce(function(s, a) { return s + calcCalories(a.duration, a.intensity); }, 0);
     document.getElementById('total-km').textContent = totalKm.toFixed(1);
     document.getElementById('total-runs').textContent = activities.length;
     document.getElementById('total-mins').textContent = totalMins;
     document.getElementById('total-cal').textContent = totalCal;
 
-    const streak = calcStreak();
-    document.getElementById('streak-badge').textContent = streak >= 7 ? '🔥' : streak > 0 ? '⚡' : '🎯';
+    var streak = calcStreak();
+    var badge = document.getElementById('streak-badge');
+    if (streak > 0) {
+      badge.textContent = streak + ' ' + (streak >= STREAK_FIRE ? '🔥' : '⚡');
+    } else {
+      badge.textContent = '🎯';
+    }
     document.getElementById('streak-sub').textContent = streak > 0
       ? streak + (streak === 1 ? ' giorno consecutivo' : ' giorni consecutivi')
       : activities.length > 0 ? 'Continua così!' : 'Carica la tua prima uscita';
 
-    const days = ['Lu','Ma','Me','Gi','Ve','Sa','Do'];
-    const now = new Date();
-    const weekKm = Array(7).fill(0);
-    const weekDur = Array(7).fill(0);
-    activities.forEach(a => {
-      const d = new Date(a.date + 'T00:00:00');
-      const diff = Math.floor((now - d) / 86400000);
-      if (diff < 7) {
-        const idx = (d.getDay() + 6) % 7;
+    var now = todayMidnight();
+    var weekKm = [0, 0, 0, 0, 0, 0, 0];
+    var weekDur = [0, 0, 0, 0, 0, 0, 0];
+    activities.forEach(function(a) {
+      var d = dateFromStr(a.date);
+      var diff = daysBetween(now, d);
+      if (diff >= 0 && diff < 7) {
+        var idx = (d.getDay() + 6) % 7;
         weekKm[idx] += a.distance;
         weekDur[idx] += a.duration;
       }
     });
-    const maxDur = Math.max(...weekDur, 1);
-    document.getElementById('week-bars').innerHTML = days.map((day, i) => {
-      const h = Math.round((weekDur[i] / maxDur) * 72) + 4;
-      return `<div class="week-col">
-        <div class="week-bar-wrap"><div class="week-bar${weekDur[i]>0?' active':''}" style="height:${h}px"></div></div>
-        <div class="week-day">${day}</div>
-        <div class="week-km">${weekKm[i] > 0 ? weekKm[i].toFixed(1) : ''}</div>
-      </div>`;
+    var maxDur = Math.max.apply(null, weekDur.concat([1]));
+    document.getElementById('week-bars').innerHTML = DAYS_WEEK.map(function(day, i) {
+      var h = Math.round((weekDur[i] / maxDur) * BAR_HEIGHT_MAX) + 4;
+      return '<div class="week-col">'
+        + '<div class="week-bar-wrap"><div class="week-bar' + (weekDur[i] > 0 ? ' active' : '') + '" style="height:' + h + 'px"></div></div>'
+        + '<div class="week-day">' + day + '</div>'
+        + '<div class="week-km">' + (weekKm[i] > 0 ? weekKm[i].toFixed(1) : '') + '</div>'
+        + '</div>';
     }).join('');
 
-    const recentEl = document.getElementById('recent-list');
-    recentEl.innerHTML = activities.length === 0
-      ? `<div class="empty"><i class="ti ti-run"></i><p>Nessuna attività ancora.<br>Aggiungi la tua prima corsa!</p></div>`
-      : activities.slice(0, 5).map(activityHTML).join('');
-  }
-
-  function renderHistory() {
-    const now = new Date();
-    const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
-    const heatData = {};
-    activities.forEach(a => {
-      const d = new Date(a.date + 'T00:00:00');
-      if (d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()) {
-        const day = d.getDate();
-        heatData[day] = (heatData[day] || 0) + 1;
-      }
-    });
-    const firstDay = (new Date(now.getFullYear(), now.getMonth(), 1).getDay() + 6) % 7;
-    let html = '';
-    for (let i = 0; i < firstDay; i++) html += `<div class="heat-cell"></div>`;
-    for (let d = 1; d <= daysInMonth; d++) {
-      const cnt = heatData[d] || 0;
-      const cls = cnt === 0 ? '' : cnt === 1 ? 'heat-1' : cnt === 2 ? 'heat-2' : 'heat-3';
-      const today = d === now.getDate() ? 'heat-today' : '';
-      html += `<div class="heat-cell ${cls} ${today}" title="${d} — ${cnt} attività"></div>`;
-    }
-    document.getElementById('heatmap').innerHTML = html;
-    document.getElementById('heatmap-days-label').innerHTML = ['L','M','M','G','V','S','D'].map(d => `<span style="flex:1;text-align:center">${d}</span>`).join('');
-
-    const maxRun = activities.filter(a => a.distance > 0).reduce((m,a) => a.distance > m ? a.distance : m, 0);
-    const maxDur = activities.reduce((m,a) => a.duration > m ? a.duration : m, 0);
-    const streak = calcStreak();
-    const prEl = document.getElementById('pr-list');
-    if (!activities.length) {
-      prEl.innerHTML = '<div class="empty" style="padding:16px 0"><p>Nessun record ancora.</p></div>';
+    var recentEl = document.getElementById('recent-list');
+    recentEl.innerHTML = '';
+    if (activities.length === 0) {
+      recentEl.appendChild(emptyActivityElement());
     } else {
-      prEl.innerHTML = `
-        <div class="pr-item"><span class="pr-label"><i class="ti ti-trophy"></i>Distanza massima</span><span class="pr-val">${maxRun.toFixed(1)} km</span></div>
-        <div class="pr-item"><span class="pr-label"><i class="ti ti-clock"></i>Allenamento più lungo</span><span class="pr-val">${maxDur} min</span></div>
-        <div class="pr-item"><span class="pr-label"><i class="ti ti-flame"></i>Serie attuale</span><span class="pr-val">${streak} gg</span></div>
-        <div class="pr-item"><span class="pr-label"><i class="ti ti-chart-bar"></i>Totale uscite</span><span class="pr-val">${activities.length}</span></div>`;
-    }
-    const allEl = document.getElementById('all-activities');
-    allEl.innerHTML = activities.length === 0
-      ? `<div class="empty"><i class="ti ti-list"></i><p>Nessuna attività ancora.</p></div>`
-      : activities.map(activityHTML).join('');
-  }
-
-  function renderInsights() {
-    const advEl = document.getElementById('advice-list');
-    if (!activities.length) {
-      advEl.innerHTML = `<div class="advice-card"><div class="advice-header"><div class="advice-icon-wrap"><i class="ti ti-info-circle"></i></div><div><div class="advice-tag">PER INIZIARE</div></div></div><div class="advice-text">Aggiungi le tue prime attività per ricevere consigli personalizzati basati sui tuoi dati di allenamento.</div></div>`;
-    } else {
-      const recent7 = activities.filter(a => (new Date() - new Date(a.date + 'T00:00:00')) / 86400000 <= 7);
-      const avgInt = recent7.length ? recent7.reduce((s,a) => s + a.intensity, 0) / recent7.length : 0;
-      const totalKm7 = recent7.reduce((s,a) => s + a.distance, 0);
-      const badMoods = activities.slice(0,10).filter(a => a.mood === '😫' || a.mood === '😐').length;
-      const advices = [];
-      if (recent7.length >= 4) advices.push({ icon: 'ti-refresh', tag: 'RECUPERO', text: `Hai fatto ${recent7.length} allenamenti negli ultimi 7 giorni. Ottimo ritmo! Assicurati di includere almeno un giorno di riposo completo per permettere ai muscoli di recuperare.` });
-      if (avgInt >= 3) advices.push({ icon: 'ti-heart-rate-monitor', tag: 'INTENSITÀ', text: 'L\'intensità media dei tuoi allenamenti recenti è elevata. Considera di inserire una sessione leggera o stretching per bilanciare il carico e prevenire infortuni.' });
-      if (totalKm7 > 0) advices.push({ icon: 'ti-trending-up', tag: 'PROGRESSIONE', text: `Questa settimana hai percorso ${totalKm7.toFixed(1)} km. Per migliorare in modo graduale e sicuro, la prossima settimana puoi provare a raggiungere ${(totalKm7 * 1.1).toFixed(1)} km (+10%).` });
-      if (badMoods >= 3) advices.push({ icon: 'ti-moon', tag: 'BENESSERE', text: 'In alcuni allenamenti recenti il tuo umore post-workout era basso. Controlla il riposo notturno e valuta di ridurre l\'intensità per qualche giorno.' });
-      if (!advices.length) advices.push({ icon: 'ti-star', tag: 'OTTIMO LAVORO', text: 'Stai andando alla grande! Continua a registrare le tue attività per ricevere consigli sempre più precisi e personalizzati.' });
-      advEl.innerHTML = advices.map(a => `<div class="advice-card"><div class="advice-header"><div class="advice-icon-wrap"><i class="ti ${a.icon}"></i></div><div><div class="advice-tag">${a.tag}</div></div></div><div class="advice-text">${a.text}</div></div>`).join('');
-    }
-
-    const sportMins = {};
-    activities.forEach(a => {
-      const n = a.sport.substring(a.sport.indexOf(' ') + 1);
-      sportMins[n] = (sportMins[n] || 0) + a.duration;
-    });
-    if (sportChart) { sportChart.destroy(); sportChart = null; }
-    const labels = Object.keys(sportMins);
-    if (labels.length) {
-      const palette = ['#5adf7c','#3aaf5c','#fac775','#f0997b','#85b7eb','#d4537e','#7f77dd'];
-      sportChart = new Chart(document.getElementById('sport-chart'), {
-        type: 'doughnut',
-        data: { labels, datasets: [{ data: Object.values(sportMins), backgroundColor: palette.slice(0, labels.length), borderWidth: 2, borderColor: '#1e2130' }] },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#8b90a8', font: { size: 12 }, padding: 14, boxWidth: 12, boxHeight: 12 } } } }
+      activities.slice(0, RECENT_COUNT).forEach(function(a) {
+        recentEl.appendChild(createActivityElement(a));
       });
     }
   }
 
-  document.getElementById('act-date').value = new Date().toISOString().split('T')[0];
-  renderDashboard();
+  function renderHistory() {
+    var year = heatmapMonth.getFullYear();
+    var month = heatmapMonth.getMonth();
+    var daysInMonth = new Date(year, month + 1, 0).getDate();
+    var heatData = {};
+    activities.forEach(function(a) {
+      var d = dateFromStr(a.date);
+      if (d.getMonth() === month && d.getFullYear() === year) {
+        var day = d.getDate();
+        heatData[day] = (heatData[day] || 0) + 1;
+      }
+    });
+    var firstDay = (new Date(year, month, 1).getDay() + 6) % 7;
+    var heatHtml = '';
+    for (var i = 0; i < firstDay; i++) {
+      heatHtml += '<div class="heat-cell"></div>';
+    }
+    var today = new Date();
+    for (var d = 1; d <= daysInMonth; d++) {
+      var cnt = heatData[d] || 0;
+      var cls = cnt === 0 ? '' : cnt === 1 ? 'heat-1' : cnt === 2 ? 'heat-2' : 'heat-3';
+      var isToday = (d === today.getDate() && month === today.getMonth() && year === today.getFullYear()) ? 'heat-today' : '';
+      heatHtml += '<div class="heat-cell ' + cls + ' ' + isToday + '" title="' + d + ' — ' + cnt + ' attività"></div>';
+    }
+    document.getElementById('heatmap').innerHTML = heatHtml;
+    document.getElementById('heatmap-days-label').innerHTML = DAYS_MIN.map(function(d) {
+      return '<span style="flex:1;text-align:center">' + d + '</span>';
+    }).join('');
+    document.getElementById('heat-month-label').textContent = heatmapMonth.toLocaleDateString('it-IT', { month: 'long', year: 'numeric' });
+
+    var maxRun = 0;
+    activities.forEach(function(a) {
+      if (a.distance > maxRun) maxRun = a.distance;
+    });
+    var maxDur = activities.reduce(function(m, a) { return a.duration > m ? a.duration : m; }, 0);
+    var streak = calcStreak();
+    var prEl = document.getElementById('pr-list');
+    if (!activities.length) {
+      prEl.innerHTML = '<div class="empty" style="padding:16px 0"><p>Nessun record ancora.</p></div>';
+    } else {
+      prEl.innerHTML = '<div class="pr-item"><span class="pr-label"><i class="ti ti-trophy"></i>Distanza massima</span><span class="pr-val">' + maxRun.toFixed(1) + ' km</span></div>'
+        + '<div class="pr-item"><span class="pr-label"><i class="ti ti-clock"></i>Allenamento più lungo</span><span class="pr-val">' + maxDur + ' min</span></div>'
+        + '<div class="pr-item"><span class="pr-label"><i class="ti ti-flame"></i>Serie attuale</span><span class="pr-val">' + streak + ' gg</span></div>'
+        + '<div class="pr-item"><span class="pr-label"><i class="ti ti-chart-bar"></i>Totale uscite</span><span class="pr-val">' + activities.length + '</span></div>';
+    }
+
+    var allEl = document.getElementById('all-activities');
+    allEl.innerHTML = '';
+    if (activities.length === 0) {
+      var emptyAll = document.getElementById('tpl-empty').content.cloneNode(true);
+      emptyAll.querySelector('i').className = 'ti ti-list';
+      emptyAll.querySelector('p').textContent = 'Nessuna attività ancora.';
+      allEl.appendChild(emptyAll);
+    } else {
+      activities.forEach(function(a) {
+        allEl.appendChild(createActivityElement(a));
+      });
+    }
+  }
+
+  function renderInsights() {
+    var advEl = document.getElementById('advice-list');
+    if (!activities.length) {
+      advEl.innerHTML = '<div class="advice-card"><div class="advice-header"><div class="advice-icon-wrap"><i class="ti ti-info-circle"></i></div><div><div class="advice-tag">PER INIZIARE</div></div></div><div class="advice-text">Aggiungi le tue prime attività per ricevere consigli personalizzati basati sui tuoi dati di allenamento.</div></div>';
+    } else {
+      var now = todayMidnight();
+      var recent7 = activities.filter(function(a) {
+        return daysBetween(now, dateFromStr(a.date)) < 7;
+      });
+      var avgInt = recent7.length ? recent7.reduce(function(s, a) { return s + a.intensity; }, 0) / recent7.length : 0;
+      var totalKm7 = recent7.reduce(function(s, a) { return s + a.distance; }, 0);
+      var badMoods = activities.slice(0, BAD_MOOD_WINDOW).filter(function(a) {
+        return a.mood === '😫' || a.mood === '😐';
+      }).length;
+      var advices = [];
+      if (recent7.length >= 4) {
+        advices.push({ icon: 'ti-refresh', tag: 'RECUPERO', text: 'Hai fatto ' + recent7.length + ' allenamenti negli ultimi 7 giorni. Ottimo ritmo! Assicurati di includere almeno un giorno di riposo completo per permettere ai muscoli di recuperare.' });
+      }
+      if (avgInt >= 3) {
+        advices.push({ icon: 'ti-heart-rate-monitor', tag: 'INTENSITÀ', text: 'L\'intensità media dei tuoi allenamenti recenti è elevata. Considera di inserire una sessione leggera o stretching per bilanciare il carico e prevenire infortuni.' });
+      }
+      if (totalKm7 > 0) {
+        var nextTarget = (totalKm7 * PROGRESSION_FACTOR).toFixed(1);
+        advices.push({ icon: 'ti-trending-up', tag: 'PROGRESSIONE', text: 'Questa settimana hai percorso ' + totalKm7.toFixed(1) + ' km. Per migliorare in modo graduale e sicuro, la prossima settimana puoi provare a raggiungere ' + nextTarget + ' km (+10%).' });
+      }
+      if (badMoods >= 3) {
+        advices.push({ icon: 'ti-moon', tag: 'BENESSERE', text: 'In alcuni allenamenti recenti il tuo umore post-workout era basso. Controlla il riposo notturno e valuta di ridurre l\'intensità per qualche giorno.' });
+      }
+      if (!advices.length) {
+        advices.push({ icon: 'ti-star', tag: 'OTTIMO LAVORO', text: 'Stai andando alla grande! Continua a registrare le tue attività per ricevere consigli sempre più precisi e personalizzati.' });
+      }
+      advEl.innerHTML = advices.map(function(a) {
+        return '<div class="advice-card"><div class="advice-header"><div class="advice-icon-wrap"><i class="ti ' + a.icon + '"></i></div><div><div class="advice-tag">' + a.tag + '</div></div></div><div class="advice-text">' + a.text + '</div></div>';
+      }).join('');
+    }
+
+    var sportMins = {};
+    activities.forEach(function(a) {
+      var name = sportName(a.sport);
+      sportMins[name] = (sportMins[name] || 0) + a.duration;
+    });
+    if (sportChart) {
+      sportChart.destroy();
+      sportChart = null;
+    }
+    var labels = Object.keys(sportMins);
+    var donutEmpty = document.getElementById('donut-empty');
+    if (labels.length) {
+      donutEmpty.style.display = 'none';
+      sportChart = new Chart(document.getElementById('sport-chart'), {
+        type: 'doughnut',
+        data: {
+          labels: labels,
+          datasets: [{
+            data: Object.values(sportMins),
+            backgroundColor: labels.map(function(_, i) { return PALETTE[i % PALETTE.length]; }),
+            borderWidth: 2,
+            borderColor: '#1e2130'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: { color: '#8b90a8', font: { size: 12 }, padding: 14, boxWidth: 12, boxHeight: 12 }
+            }
+          }
+        }
+      });
+    } else {
+      donutEmpty.style.display = 'flex';
+    }
+  }
+
+  // ===== EVENT HANDLERS =====
+  document.addEventListener('DOMContentLoaded', function() {
+    // Nav delegation
+    document.querySelector('.nav').addEventListener('click', function(e) {
+      var btn = e.target.closest('.nav-btn');
+      if (btn) showPage(btn.getAttribute('data-page'), btn);
+    });
+
+    // Mood delegation
+    document.getElementById('mood-row').addEventListener('click', function(e) {
+      var btn = e.target.closest('.mood-btn');
+      if (!btn) return;
+      document.querySelectorAll('.mood-btn').forEach(function(b) { b.classList.remove('selected'); });
+      btn.classList.add('selected');
+      selectedMood = btn.getAttribute('data-mood');
+    });
+
+    // Intensity slider
+    document.getElementById('act-intensity').addEventListener('input', function() {
+      updateIntensity(this.value);
+    });
+
+    // Form submit
+    document.getElementById('activity-form').addEventListener('submit', saveActivity);
+
+    // Activity actions delegation (recent list)
+    document.getElementById('recent-list').addEventListener('click', function(e) {
+      var btn = e.target.closest('[data-action]');
+      if (!btn) return;
+      var item = btn.closest('[data-id]');
+      if (!item) return;
+      var id = parseInt(item.getAttribute('data-id'));
+      if (btn.getAttribute('data-action') === 'edit') {
+        var act = activities.find(function(a) { return a.id === id; });
+        if (act) populateForm(act);
+      } else if (btn.getAttribute('data-action') === 'delete') {
+        deleteActivity(id);
+      }
+    });
+
+    // Activity actions delegation (all activities list)
+    document.getElementById('all-activities').addEventListener('click', function(e) {
+      var btn = e.target.closest('[data-action]');
+      if (!btn) return;
+      var item = btn.closest('[data-id]');
+      if (!item) return;
+      var id = parseInt(item.getAttribute('data-id'));
+      if (btn.getAttribute('data-action') === 'edit') {
+        var act = activities.find(function(a) { return a.id === id; });
+        if (act) populateForm(act);
+      } else if (btn.getAttribute('data-action') === 'delete') {
+        deleteActivity(id);
+      }
+    });
+
+    // Heatmap navigation
+    document.getElementById('heat-prev').addEventListener('click', function() {
+      heatmapMonth.setMonth(heatmapMonth.getMonth() - 1);
+      renderHistory();
+    });
+    document.getElementById('heat-next').addEventListener('click', function() {
+      heatmapMonth.setMonth(heatmapMonth.getMonth() + 1);
+      renderHistory();
+    });
+
+    // Init
+    activities = Store.load();
+    document.getElementById('act-date').value = todayStr();
+    document.getElementById('act-date').setAttribute('max', todayStr());
+    updateIntensity(document.getElementById('act-intensity').value);
+    renderDashboard();
+  });
 </script>
 </body>
 </html>
