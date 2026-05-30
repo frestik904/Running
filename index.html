@@ -356,7 +356,7 @@
 
       .week-bars { height: 130px; gap: 10px; }
 
-      .form-row { grid-template-columns: repeat(3, 1fr); }
+      .form-row { grid-template-columns: repeat(2, 1fr); }
       .mood-btn { font-size: 28px; padding: 14px; }
 
       .heatmap-year-wrap { max-width: 600px; }
@@ -502,8 +502,18 @@
           <input type="date" id="act-date" max="" />
         </div>
         <div class="form-group">
-          <label class="form-label" for="act-duration">Durata (min)</label>
-          <input type="number" id="act-duration" min="1" max="600" placeholder="45" />
+          <label class="form-label" for="act-duration">Durata (mm:ss o h:mm:ss)</label>
+          <input type="text" id="act-duration" placeholder="45" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="act-pace">Passo medio (mm:ss/km, opz.)</label>
+          <input type="text" id="act-pace" placeholder="4:30" />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="act-calories">Calorie bruciate (opz.)</label>
+          <input type="number" id="act-calories" min="0" placeholder="320" />
         </div>
       </div>
       <div class="form-group">
@@ -761,6 +771,45 @@
   function hideError() {
     document.getElementById('form-error').style.display = 'none';
   }
+  function parseDuration(str) {
+    if (!str || !str.trim()) return 0;
+    str = str.trim();
+    var parts = str.split(':');
+    if (parts.length === 3) {
+      return parseInt(parts[0]) * 60 + parseInt(parts[1]) + parseInt(parts[2]) / 60;
+    } else if (parts.length === 2) {
+      return parseInt(parts[0]) + parseInt(parts[1]) / 60;
+    }
+    return parseFloat(str);
+  }
+  function formatDuration(min) {
+    if (!min || min <= 0) return '';
+    var totalSec = Math.round(min * 60);
+    var h = Math.floor(totalSec / 3600);
+    var m = Math.floor((totalSec % 3600) / 60);
+    var s = totalSec % 60;
+    if (h > 0) return h + ':' + String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+    if (s > 0) return m + ':' + String(s).padStart(2, '0');
+    return String(m);
+  }
+  function parsePace(str) {
+    if (!str || !str.trim()) return null;
+    var parts = str.trim().split(':');
+    if (parts.length === 2) {
+      var s = parseInt(parts[0]) * 60 + parseInt(parts[1]);
+      return isNaN(s) ? null : s;
+    }
+    return null;
+  }
+  function formatPace(sec) {
+    if (sec === null || sec === undefined) return '\u2014';
+    var m = Math.floor(sec / 60);
+    var s = sec % 60;
+    return m + ':' + String(s).padStart(2, '0') + ' /km';
+  }
+  function getCalories(a) {
+    return (a.calories && a.calories > 0) ? a.calories : calcCalories(a.duration, a.intensity);
+  }
 
   // ===== PHASE 2 — COMPARE & STATS =====
   function getWeekComparison() {
@@ -966,9 +1015,11 @@
     root.setAttribute('data-id', activity.id);
     clone.querySelector('.activity-icon').textContent = sportEmoji(activity.sport) || '🏃';
     clone.querySelector('.activity-name').textContent = sportName(activity.sport);
-    const meta = [activity.duration + ' min'];
+    var durDisplay = formatDuration(activity.duration);
+    var meta = [durDisplay + (durDisplay.indexOf(':') > -1 ? '' : ' min')];
     if (activity.distance > 0) meta.push(activity.distance.toFixed(1) + ' km');
-    meta.push(calcCalories(activity.duration, activity.intensity) + ' kcal');
+    if (activity.pace) meta.push(formatPace(activity.pace));
+    meta.push(getCalories(activity) + ' kcal');
     clone.querySelector('.activity-meta').textContent = meta.join(' · ');
     const badge = clone.querySelector('.badge');
     badge.textContent = intensityName(activity.intensity);
@@ -1009,6 +1060,8 @@
     document.getElementById('act-date').setAttribute('max', todayStr());
     document.getElementById('act-intensity').value = '2';
     document.getElementById('act-distance').value = '';
+    document.getElementById('act-pace').value = '';
+    document.getElementById('act-calories').value = '';
     document.getElementById('act-notes').value = '';
     updateIntensity(2);
     selectedMood = '😊';
@@ -1032,8 +1085,16 @@
     editingId = activity.id;
     document.getElementById('sport-type').value = activity.sport;
     document.getElementById('act-date').value = activity.date;
-    document.getElementById('act-duration').value = activity.duration;
+    document.getElementById('act-duration').value = formatDuration(activity.duration);
     document.getElementById('act-distance').value = activity.distance || '';
+    if (activity.pace) {
+      var pm = Math.floor(activity.pace / 60);
+      var ps = activity.pace % 60;
+      document.getElementById('act-pace').value = pm + ':' + String(ps).padStart(2, '0');
+    } else {
+      document.getElementById('act-pace').value = '';
+    }
+    document.getElementById('act-calories').value = (activity.calories > 0) ? activity.calories : '';
     document.getElementById('act-intensity').value = activity.intensity;
     updateIntensity(activity.intensity);
     selectedMood = activity.mood;
@@ -1055,11 +1116,10 @@
     btn.innerHTML = '<i class="ti ti-loader"></i> Salvataggio...';
 
     var date = document.getElementById('act-date').value;
-    var durationRaw = document.getElementById('act-duration').value;
-    var duration = Number(durationRaw);
+    var duration = parseDuration(document.getElementById('act-duration').value);
     if (!date) { btn.classList.remove('saving'); btn.innerHTML = '<i class="ti ti-device-floppy"></i> Salva attività'; showError('Inserisci una data.'); return; }
     if (date > todayStr()) { btn.classList.remove('saving'); btn.innerHTML = '<i class="ti ti-device-floppy"></i> Salva attività'; showError('La data non può essere futura.'); return; }
-    if (!durationRaw || !Number.isInteger(duration) || duration < 1) { btn.classList.remove('saving'); btn.innerHTML = '<i class="ti ti-device-floppy"></i> Salva attività'; showError('Inserisci una durata valida.'); return; }
+    if (!duration || duration < 1) { btn.classList.remove('saving'); btn.innerHTML = '<i class="ti ti-device-floppy"></i> Salva attività'; showError('Inserisci una durata valida (es. 45 o 1:30:00).'); return; }
     if (duration > 600) { btn.classList.remove('saving'); btn.innerHTML = '<i class="ti ti-device-floppy"></i> Salva attività'; showError('La durata non può superare 600 minuti.'); return; }
 
     var editMode = editingId !== null;
@@ -1073,6 +1133,11 @@
       mood: selectedMood,
       notes: document.getElementById('act-notes').value.trim()
     };
+    var paceRaw = document.getElementById('act-pace').value;
+    var parsedPace = parsePace(paceRaw);
+    if (parsedPace !== null) activity.pace = parsedPace;
+    var calRaw = parseInt(document.getElementById('act-calories').value);
+    if (!isNaN(calRaw) && calRaw > 0) activity.calories = calRaw;
 
     if (editMode) {
       var idx = activities.findIndex(function(a) { return a.id === editingId; });
@@ -1117,8 +1182,8 @@
   // ===== RENDERERS =====
   function renderDashboard() {
     var totalKm = activities.reduce(function(s, a) { return s + a.distance; }, 0);
-    var totalMins = activities.reduce(function(s, a) { return s + a.duration; }, 0);
-    var totalCal = activities.reduce(function(s, a) { return s + calcCalories(a.duration, a.intensity); }, 0);
+    var totalMins = Math.round(activities.reduce(function(s, a) { return s + a.duration; }, 0));
+    var totalCal = Math.round(activities.reduce(function(s, a) { return s + getCalories(a); }, 0));
 
     var prevKm = parseFloat(document.getElementById('total-km').getAttribute('data-prev') || '0');
     var prevRuns = parseInt(document.getElementById('total-runs').getAttribute('data-prev') || '0');
@@ -1308,7 +1373,7 @@
       prEl.appendChild(document.getElementById('tpl-empty-records').content.cloneNode(true));
     } else {
       prEl.innerHTML = '<div class="pr-item"><span class="pr-label"><i class="ti ti-trophy"></i>Distanza massima</span><span class="pr-val">' + maxRun.toFixed(1) + ' km</span></div>'
-        + '<div class="pr-item"><span class="pr-label"><i class="ti ti-clock"></i>Allenamento più lungo</span><span class="pr-val">' + maxDur + ' min</span></div>'
+        + '<div class="pr-item"><span class="pr-label"><i class="ti ti-clock"></i>Allenamento più lungo</span><span class="pr-val">' + formatDuration(maxDur) + '</span></div>'
         + '<div class="pr-item"><span class="pr-label"><i class="ti ti-flame"></i>Serie attuale</span><span class="pr-val">' + streak + ' gg</span></div>'
         + '<div class="pr-item"><span class="pr-label"><i class="ti ti-chart-bar"></i>Totale uscite</span><span class="pr-val">' + activities.length + '</span></div>';
     }
