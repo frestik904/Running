@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AthleteLog — Il tuo sport tracker</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+  <style>
+    :root {
+      --bg-primary: #0f1117;
+      --bg-secondary: #1a1d27;
+      --bg-card: #1e2130;
+      --bg-input: #252840;
+      --accent: #5adf7c;
+      --accent-dim: #1e3a28;
+      --text-primary: #f0f2ff;
+      --text-secondary: #8b90a8;
+      --border: rgba(255,255,255,0.07);
+      --border-hover: rgba(255,255,255,0.14);
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; background: var(--bg-primary); color: var(--text-primary); font-family: -apple-system, 'Segoe UI', sans-serif; }
+    body { display: flex; flex-direction: column; max-width: 480px; margin: 0 auto; min-height: 100vh; position: relative; }
+
+    /* NAV */
+    .nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; display: flex; background: var(--bg-card); border-top: 1px solid var(--border); z-index: 100; padding: 6px 0 10px; }
+    .nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 6px 4px; border: none; background: none; cursor: pointer; color: var(--text-secondary); font-size: 10px; letter-spacing: 0.3px; transition: color 0.15s; }
+    .nav-btn i { font-size: 22px; }
+    .nav-btn.active { color: var(--accent); }
+
+    /* PAGES */
+    .page { display: none; padding: 20px 16px 100px; flex: 1; overflow-y: auto; }
+    .page.active { display: block; }
+
+    /* HEADER */
+    .page-header { margin-bottom: 20px; }
+    .page-title { font-size: 22px; font-weight: 700; color: var(--text-primary); }
+    .page-sub { font-size: 14px; color: var(--text-secondary); margin-top: 3px; }
+
+    /* CARDS */
+    .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px; margin-bottom: 14px; }
+    .card-label { font-size: 11px; font-weight: 600; letter-spacing: 0.8px; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 12px; }
+
+    /* STREAK BANNER */
+    .streak-banner { background: linear-gradient(135deg, var(--accent-dim) 0%, #1a2535 100%); border: 1px solid rgba(90,223,124,0.15); border-radius: var(--radius-lg); padding: 18px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; }
+    .streak-name { font-size: 18px; font-weight: 700; }
+    .streak-sub { font-size: 13px; color: var(--text-secondary); margin-top: 4px; }
+    .streak-num { font-size: 42px; line-height: 1; }
+
+    /* METRIC GRID */
+    .metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+    .metric-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 14px; }
+    .metric-label { font-size: 11px; color: var(--text-secondary); margin-bottom: 6px; }
+    .metric-val { font-size: 26px; font-weight: 700; color: var(--text-primary); line-height: 1; }
+    .metric-unit { font-size: 13px; font-weight: 400; color: var(--text-secondary); }
+
+    /* ACTIVITY ITEMS */
+    .activity-item { display: flex; align-items: center; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--border); }
+    .activity-item:last-child { border-bottom: none; }
+    .activity-icon { width: 42px; height: 42px; border-radius: var(--radius-sm); background: var(--bg-input); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+    .activity-name { font-size: 14px; font-weight: 600; }
+    .activity-meta { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+    .activity-right { margin-left: auto; text-align: right; flex-shrink: 0; }
+    .activity-mood { font-size: 18px; }
+    .activity-date { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+
+    /* BADGES */
+    .badge { display: inline-block; font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 99px; margin-top: 4px; }
+    .badge-easy { background: rgba(90,223,124,0.12); color: #5adf7c; }
+    .badge-medium { background: rgba(250,199,117,0.12); color: #fac775; }
+    .badge-hard { background: rgba(240,153,123,0.12); color: #f0997b; }
+    .badge-max { background: rgba(224,75,74,0.12); color: #e24b4a; }
+
+    /* WEEK BAR */
+    .week-bars { display: flex; gap: 6px; align-items: flex-end; height: 90px; margin-top: 4px; }
+    .week-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; height: 100%; }
+    .week-bar-wrap { flex: 1; display: flex; align-items: flex-end; width: 100%; }
+    .week-bar { width: 100%; border-radius: 4px 4px 0 0; background: var(--bg-input); transition: height 0.4s ease; min-height: 4px; }
+    .week-bar.active { background: var(--accent); }
+    .week-day { font-size: 10px; color: var(--text-secondary); }
+    .week-km { font-size: 9px; color: var(--accent); min-height: 12px; }
+
+    /* FORM */
+    .form-group { margin-bottom: 16px; }
+    .form-label { font-size: 13px; color: var(--text-secondary); margin-bottom: 7px; display: block; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    select, input[type=text], input[type=number], input[type=date], textarea {
+      width: 100%; background: var(--bg-input); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); color: var(--text-primary); font-size: 14px;
+      padding: 10px 12px; outline: none; font-family: inherit; transition: border-color 0.15s;
+      -webkit-appearance: none; appearance: none;
+    }
+    select:focus, input:focus, textarea:focus { border-color: var(--accent); }
+    select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238b90a8' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px; cursor: pointer; }
+    textarea { resize: vertical; min-height: 80px; line-height: 1.5; }
+    input[type=date]::-webkit-calendar-picker-indicator { filter: invert(0.5); cursor: pointer; }
+
+    /* RANGE */
+    .range-wrap input[type=range] { width: 100%; height: 4px; -webkit-appearance: none; appearance: none; background: var(--bg-input); border-radius: 2px; outline: none; cursor: pointer; }
+    .range-wrap input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--accent); cursor: pointer; }
+    .intensity-labels { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-secondary); margin-top: 6px; }
+
+    /* MOOD */
+    .mood-row { display: flex; gap: 8px; }
+    .mood-btn { flex: 1; padding: 10px 4px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--bg-input); cursor: pointer; font-size: 22px; text-align: center; transition: all 0.15s; }
+    .mood-btn.selected { border-color: var(--accent); background: var(--accent-dim); }
+
+    /* SAVE BTN */
+    .save-btn { width: 100%; padding: 15px; background: var(--accent); color: #0a1a12; border: none; border-radius: var(--radius-md); font-size: 15px; font-weight: 700; cursor: pointer; margin-top: 4px; transition: opacity 0.15s, transform 0.1s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .save-btn:hover { opacity: 0.9; }
+    .save-btn:active { transform: scale(0.98); }
+    .success-msg { display: none; align-items: center; gap: 10px; color: var(--accent); background: var(--accent-dim); border: 1px solid rgba(90,223,124,0.2); border-radius: var(--radius-sm); padding: 12px 14px; margin-top: 12px; font-size: 14px; font-weight: 500; }
+
+    /* HEATMAP */
+    .heatmap-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-top: 8px; }
+    .heat-cell { aspect-ratio: 1; border-radius: 3px; background: var(--bg-input); }
+    .heat-1 { background: rgba(90,223,124,0.25); }
+    .heat-2 { background: rgba(90,223,124,0.55); }
+    .heat-3 { background: var(--accent); }
+    .heat-today { outline: 2px solid var(--accent); outline-offset: 1px; }
+    .heatmap-legend { display: flex; align-items: center; gap: 6px; margin-top: 10px; font-size: 11px; color: var(--text-secondary); }
+    .heatmap-legend span { width: 12px; height: 12px; border-radius: 2px; display: inline-block; }
+
+    /* PR */
+    .pr-item { display: flex; align-items: center; justify-content: space-between; padding: 11px 0; border-bottom: 1px solid var(--border); }
+    .pr-item:last-child { border-bottom: none; }
+    .pr-label { font-size: 14px; color: var(--text-secondary); display: flex; align-items: center; gap: 8px; }
+    .pr-label i { font-size: 18px; color: var(--accent); }
+    .pr-val { font-size: 16px; font-weight: 700; }
+
+    /* ADVICE */
+    .advice-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px; margin-bottom: 12px; }
+    .advice-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .advice-icon-wrap { width: 36px; height: 36px; border-radius: var(--radius-sm); background: var(--accent-dim); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .advice-icon-wrap i { font-size: 20px; color: var(--accent); }
+    .advice-tag { font-size: 11px; font-weight: 600; color: var(--accent); letter-spacing: 0.5px; }
+    .advice-text { font-size: 14px; color: var(--text-secondary); line-height: 1.6; }
+
+    /* DONUT */
+    .donut-wrap { position: relative; height: 200px; margin-top: 8px; }
+
+    /* EMPTY STATE */
+    .empty { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 32px 16px; gap: 10px; color: var(--text-secondary); text-align: center; }
+    .empty i { font-size: 44px; opacity: 0.3; }
+    .empty p { font-size: 14px; line-height: 1.5; }
+
+    /* SCROLLBAR */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border-hover); border-radius: 2px; }
+
+    /* === DESKTOP (≥768px) === */
+    @media (min-width: 768px) {
+      body { max-width: 100%; }
+
+      .nav {
+        position: fixed; top: 0; left: 0; bottom: auto;
+        transform: none; width: 220px; max-width: 220px;
+        height: 100dvh; flex-direction: column;
+        border-top: none; border-right: 1px solid var(--border);
+        padding: 24px 0; justify-content: flex-start; gap: 2px;
+      }
+      .nav-btn {
+        flex-direction: row; justify-content: flex-start;
+        gap: 12px; padding: 10px 24px;
+        font-size: 13px; letter-spacing: 0;
+      }
+      .nav-btn i { font-size: 20px; }
+      .nav-btn.active { background: var(--bg-input); border-radius: 0; }
+
+      .page { padding: 40px; margin-left: 220px; max-width: none; }
+
+      .metric-grid { grid-template-columns: repeat(4, 1fr); gap: 14px; }
+
+      .streak-banner { padding: 24px 28px; }
+      .streak-name { font-size: 24px; }
+      .streak-num { font-size: 52px; }
+
+      .week-bars { height: 130px; gap: 10px; }
+
+      .form-row { grid-template-columns: repeat(3, 1fr); }
+      .mood-btn { font-size: 28px; padding: 14px; }
+
+      .heatmap-grid { gap: 5px; max-width: 500px; }
+
+      #advice-list { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+      .donut-wrap { height: 260px; max-width: 400px; }
+
+      .card { padding: 20px; }
+
+      select, input[type=text], input[type=number], input[type=date], textarea {
+        font-size: 15px; padding: 12px 14px;
+      }
+
+      .activity-item { padding: 13px 0; }
+      .activity-icon { width: 48px; height: 48px; font-size: 24px; }
+      .activity-name { font-size: 15px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- DASHBOARD -->
+<div id="page-dashboard" class="page active">
+  <div class="streak-banner">
+    <div>
+      <div class="streak-name">Ciao, Runner! 🏃</div>
+      <div class="streak-sub" id="streak-sub">Carica la tua prima uscita</div>
+    </div>
+    <div class="streak-num" id="streak-badge">🎯</div>
+  </div>
+
+  <div class="metric-grid">
+    <div class="metric-card">
+      <div class="metric-label">Km totali</div>
+      <div class="metric-val"><span id="total-km">0</span><span class="metric-unit"> km</span></div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Uscite</div>
+      <div class="metric-val"><span id="total-runs">0</span><span class="metric-unit"> run</span></div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Minuti</div>
+      <div class="metric-val"><span id="total-mins">0</span><span class="metric-unit"> min</span></div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Calorie stimate</div>
+      <div class="metric-val"><span id="total-cal">0</span><span class="metric-unit"> kcal</span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-label">Questa settimana</div>
+    <div class="week-bars" id="week-bars"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-label">Attività recenti</div>
+    <div id="recent-list">
+      <div class="empty"><i class="ti ti-run"></i><p>Nessuna attività ancora.<br>Aggiungi la tua prima corsa!</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- LOG -->
+<div id="page-log" class="page">
+  <div class="page-header">
+    <div class="page-title">Nuova attività</div>
+    <div class="page-sub">Registra il tuo allenamento</div>
+  </div>
+  <div class="card">
+    <div class="form-group">
+      <label class="form-label">Sport</label>
+      <select id="sport-type">
+        <option value="🏃 Running">🏃 Running</option>
+        <option value="🚴 Ciclismo">🚴 Ciclismo</option>
+        <option value="🏋️ Palestra">🏋️ Palestra</option>
+        <option value="🏊 Nuoto">🏊 Nuoto</option>
+        <option value="⚽ Calcio">⚽ Calcio</option>
+        <option value="🧘 Yoga">🧘 Yoga</option>
+        <option value="🥊 Boxe">🥊 Boxe</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Data</label>
+        <input type="date" id="act-date" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Durata (min)</label>
+        <input type="number" id="act-duration" min="1" max="600" placeholder="45" />
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Distanza (km, opzionale)</label>
+      <input type="number" id="act-distance" min="0" step="0.1" placeholder="5.5" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Intensità — <strong id="intensity-label" style="color:var(--accent)">Media</strong></label>
+      <div class="range-wrap">
+        <input type="range" min="1" max="4" step="1" value="2" id="act-intensity" oninput="updateIntensity(this.value)" />
+        <div class="intensity-labels"><span>Facile</span><span>Media</span><span>Difficile</span><span>Massima</span></div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Umore post-allenamento</label>
+      <div class="mood-row" id="mood-row">
+        <button class="mood-btn" onclick="selectMood(this,'😫')">😫</button>
+        <button class="mood-btn" onclick="selectMood(this,'😐')">😐</button>
+        <button class="mood-btn selected" onclick="selectMood(this,'😊')">😊</button>
+        <button class="mood-btn" onclick="selectMood(this,'💪')">💪</button>
+        <button class="mood-btn" onclick="selectMood(this,'🔥')">🔥</button>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Note (opzionale)</label>
+      <textarea id="act-notes" placeholder="Com'è andata? Percorso, sensazioni..."></textarea>
+    </div>
+    <button class="save-btn" onclick="saveActivity()">
+      <i class="ti ti-device-floppy"></i> Salva attività
+    </button>
+    <div class="success-msg" id="success-msg">
+      <i class="ti ti-circle-check" style="font-size:20px"></i> Attività salvata con successo!
+    </div>
+  </div>
+</div>
+
+<!-- HISTORY -->
+<div id="page-history" class="page">
+  <div class="page-header">
+    <div class="page-title">Storico</div>
+    <div class="page-sub">I tuoi allenamenti passati</div>
+  </div>
+  <div class="card">
+    <div class="card-label">Heatmap mensile</div>
+    <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-secondary);margin-bottom:4px" id="heatmap-days-label"></div>
+    <div class="heatmap-grid" id="heatmap"></div>
+    <div class="heatmap-legend">
+      <span>Meno</span>
+      <span style="background:var(--bg-input);border:1px solid var(--border)"></span>
+      <span class="heat-1"></span>
+      <span class="heat-2"></span>
+      <span class="heat-3"></span>
+      <span>Di più</span>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-label">Record personali</div>
+    <div id="pr-list"><div class="empty" style="padding:16px 0"><p>Nessun record ancora.</p></div></div>
+  </div>
+  <div class="card">
+    <div class="card-label">Tutte le attività</div>
+    <div id="all-activities"><div class="empty"><i class="ti ti-list"></i><p>Nessuna attività ancora.</p></div></div>
+  </div>
+</div>
+
+<!-- INSIGHTS -->
+<div id="page-insights" class="page">
+  <div class="page-header">
+    <div class="page-title">Consigli</div>
+    <div class="page-sub">Basati sui tuoi dati</div>
+  </div>
+  <div id="advice-list"></div>
+  <div class="card">
+    <div class="card-label">Sport per tempo (minuti)</div>
+    <div class="donut-wrap"><canvas id="sport-chart" role="img" aria-label="Grafico distribuzione sport"></canvas></div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="nav">
+  <button class="nav-btn active" onclick="showPage('dashboard',this)">
+    <i class="ti ti-layout-dashboard"></i>Dashboard
+  </button>
+  <button class="nav-btn" onclick="showPage('log',this)">
+    <i class="ti ti-circle-plus"></i>Aggiungi
+  </button>
+  <button class="nav-btn" onclick="showPage('history',this)">
+    <i class="ti ti-list-details"></i>Storico
+  </button>
+  <button class="nav-btn" onclick="showPage('insights',this)">
+    <i class="ti ti-bulb"></i>Consigli
+  </button>
+</nav>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+  let activities = JSON.parse(localStorage.getItem('athletelog_v2') || '[]');
+  let selectedMood = '😊';
+  let sportChart = null;
+
+  const intLabels = ['','Facile','Media','Difficile','Massima'];
+  const intBadge = ['','badge-easy','badge-medium','badge-hard','badge-max'];
+  const calPerMin = [0, 7, 9, 11, 14];
+
+  function showPage(id, btn) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('page-' + id).classList.add('active');
+    btn.classList.add('active');
+    if (id === 'dashboard') renderDashboard();
+    if (id === 'history') renderHistory();
+    if (id === 'insights') renderInsights();
+  }
+
+  function updateIntensity(v) {
+    document.getElementById('intensity-label').textContent = intLabels[v];
+  }
+
+  function selectMood(btn, mood) {
+    document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    selectedMood = mood;
+  }
+
+  function saveActivity() {
+    const date = document.getElementById('act-date').value;
+    const duration = parseInt(document.getElementById('act-duration').value);
+    if (!date || !duration || duration < 1) { alert('Inserisci almeno data e durata.'); return; }
+    const a = {
+      id: Date.now(),
+      sport: document.getElementById('sport-type').value,
+      date,
+      duration,
+      distance: parseFloat(document.getElementById('act-distance').value) || 0,
+      intensity: parseInt(document.getElementById('act-intensity').value),
+      mood: selectedMood,
+      notes: document.getElementById('act-notes').value.trim()
+    };
+    activities.unshift(a);
+    localStorage.setItem('athletelog_v2', JSON.stringify(activities));
+    const msg = document.getElementById('success-msg');
+    msg.style.display = 'flex';
+    setTimeout(() => msg.style.display = 'none', 3000);
+    document.getElementById('act-duration').value = '';
+    document.getElementById('act-distance').value = '';
+    document.getElementById('act-notes').value = '';
+  }
+
+  function activityHTML(a) {
+    const emoji = a.sport.split(' ')[0];
+    const name = a.sport.substring(a.sport.indexOf(' ') + 1);
+    const d = new Date(a.date + 'T00:00:00');
+    const dateStr = d.toLocaleDateString('it-IT', { day: '2-digit', month: 'short', year: '2-digit' });
+    const cal = Math.round(a.duration * calPerMin[a.intensity]);
+    return `<div class="activity-item">
+      <div class="activity-icon">${emoji}</div>
+      <div style="min-width:0">
+        <div class="activity-name">${name}</div>
+        <div class="activity-meta">${a.duration} min${a.distance > 0 ? ' · ' + a.distance.toFixed(1) + ' km' : ''} · ${cal} kcal</div>
+        <span class="badge ${intBadge[a.intensity]}">${intLabels[a.intensity]}</span>
+      </div>
+      <div class="activity-right">
+        <div class="activity-mood">${a.mood}</div>
+        <div class="activity-date">${dateStr}</div>
+      </div>
+    </div>`;
+  }
+
+  function calcStreak() {
+    if (!activities.length) return 0;
+    const dates = [...new Set(activities.map(a => a.date))].sort().reverse();
+    let streak = 0;
+    let cur = new Date(); cur.setHours(0,0,0,0);
+    for (const d of dates) {
+      const dd = new Date(d + 'T00:00:00');
+      const diff = Math.round((cur - dd) / 86400000);
+      if (diff <= 1) { streak++; cur = dd; } else break;
+    }
+    return streak;
+  }
+
+  function renderDashboard() {
+    const totalKm = activities.reduce((s,a) => s + a.distance, 0);
+    const totalMins = activities.reduce((s,a) => s + a.duration, 0);
+    const totalCal = activities.reduce((s,a) => s + Math.round(a.duration * calPerMin[a.intensity]), 0);
+    document.getElementById('total-km').textContent = totalKm.toFixed(1);
+    document.getElementById('total-runs').textContent = activities.length;
+    document.getElementById('total-mins').textContent = totalMins;
+    document.getElementById('total-cal').textContent = totalCal;
+
+    const streak = calcStreak();
+    document.getElementById('streak-badge').textContent = streak >= 7 ? '🔥' : streak > 0 ? '⚡' : '🎯';
+    document.getElementById('streak-sub').textContent = streak > 0
+      ? streak + (streak === 1 ? ' giorno consecutivo' : ' giorni consecutivi')
+      : activities.length > 0 ? 'Continua così!' : 'Carica la tua prima uscita';
+
+    const days = ['Lu','Ma','Me','Gi','Ve','Sa','Do'];
+    const now = new Date();
+    const weekKm = Array(7).fill(0);
+    const weekDur = Array(7).fill(0);
+    activities.forEach(a => {
+      const d = new Date(a.date + 'T00:00:00');
+      const diff = Math.floor((now - d) / 86400000);
+      if (diff < 7) {
+        const idx = (d.getDay() + 6) % 7;
+        weekKm[idx] += a.distance;
+        weekDur[idx] += a.duration;
+      }
+    });
+    const maxDur = Math.max(...weekDur, 1);
+    document.getElementById('week-bars').innerHTML = days.map((day, i) => {
+      const h = Math.round((weekDur[i] / maxDur) * 72) + 4;
+      return `<div class="week-col">
+        <div class="week-bar-wrap"><div class="week-bar${weekDur[i]>0?' active':''}" style="height:${h}px"></div></div>
+        <div class="week-day">${day}</div>
+        <div class="week-km">${weekKm[i] > 0 ? weekKm[i].toFixed(1) : ''}</div>
+      </div>`;
+    }).join('');
+
+    const recentEl = document.getElementById('recent-list');
+    recentEl.innerHTML = activities.length === 0
+      ? `<div class="empty"><i class="ti ti-run"></i><p>Nessuna attività ancora.<br>Aggiungi la tua prima corsa!</p></div>`
+      : activities.slice(0, 5).map(activityHTML).join('');
+  }
+
+  function renderHistory() {
+    const now = new Date();
+    const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+    const heatData = {};
+    activities.forEach(a => {
+      const d = new Date(a.date + 'T00:00:00');
+      if (d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()) {
+        const day = d.getDate();
+        heatData[day] = (heatData[day] || 0) + 1;
+      }
+    });
+    const firstDay = (new Date(now.getFullYear(), now.getMonth(), 1).getDay() + 6) % 7;
+    let html = '';
+    for (let i = 0; i < firstDay; i++) html += `<div class="heat-cell"></div>`;
+    for (let d = 1; d <= daysInMonth; d++) {
+      const cnt = heatData[d] || 0;
+      const cls = cnt === 0 ? '' : cnt === 1 ? 'heat-1' : cnt === 2 ? 'heat-2' : 'heat-3';
+      const today = d === now.getDate() ? 'heat-today' : '';
+      html += `<div class="heat-cell ${cls} ${today}" title="${d} — ${cnt} attività"></div>`;
+    }
+    document.getElementById('heatmap').innerHTML = html;
+    document.getElementById('heatmap-days-label').innerHTML = ['L','M','M','G','V','S','D'].map(d => `<span style="flex:1;text-align:center">${d}</span>`).join('');
+
+    const maxRun = activities.filter(a => a.distance > 0).reduce((m,a) => a.distance > m ? a.distance : m, 0);
+    const maxDur = activities.reduce((m,a) => a.duration > m ? a.duration : m, 0);
+    const streak = calcStreak();
+    const prEl = document.getElementById('pr-list');
+    if (!activities.length) {
+      prEl.innerHTML = '<div class="empty" style="padding:16px 0"><p>Nessun record ancora.</p></div>';
+    } else {
+      prEl.innerHTML = `
+        <div class="pr-item"><span class="pr-label"><i class="ti ti-trophy"></i>Distanza massima</span><span class="pr-val">${maxRun.toFixed(1)} km</span></div>
+        <div class="pr-item"><span class="pr-label"><i class="ti ti-clock"></i>Allenamento più lungo</span><span class="pr-val">${maxDur} min</span></div>
+        <div class="pr-item"><span class="pr-label"><i class="ti ti-flame"></i>Serie attuale</span><span class="pr-val">${streak} gg</span></div>
+        <div class="pr-item"><span class="pr-label"><i class="ti ti-chart-bar"></i>Totale uscite</span><span class="pr-val">${activities.length}</span></div>`;
+    }
+    const allEl = document.getElementById('all-activities');
+    allEl.innerHTML = activities.length === 0
+      ? `<div class="empty"><i class="ti ti-list"></i><p>Nessuna attività ancora.</p></div>`
+      : activities.map(activityHTML).join('');
+  }
+
+  function renderInsights() {
+    const advEl = document.getElementById('advice-list');
+    if (!activities.length) {
+      advEl.innerHTML = `<div class="advice-card"><div class="advice-header"><div class="advice-icon-wrap"><i class="ti ti-info-circle"></i></div><div><div class="advice-tag">PER INIZIARE</div></div></div><div class="advice-text">Aggiungi le tue prime attività per ricevere consigli personalizzati basati sui tuoi dati di allenamento.</div></div>`;
+    } else {
+      const recent7 = activities.filter(a => (new Date() - new Date(a.date + 'T00:00:00')) / 86400000 <= 7);
+      const avgInt = recent7.length ? recent7.reduce((s,a) => s + a.intensity, 0) / recent7.length : 0;
+      const totalKm7 = recent7.reduce((s,a) => s + a.distance, 0);
+      const badMoods = activities.slice(0,10).filter(a => a.mood === '😫' || a.mood === '😐').length;
+      const advices = [];
+      if (recent7.length >= 4) advices.push({ icon: 'ti-refresh', tag: 'RECUPERO', text: `Hai fatto ${recent7.length} allenamenti negli ultimi 7 giorni. Ottimo ritmo! Assicurati di includere almeno un giorno di riposo completo per permettere ai muscoli di recuperare.` });
+      if (avgInt >= 3) advices.push({ icon: 'ti-heart-rate-monitor', tag: 'INTENSITÀ', text: 'L\'intensità media dei tuoi allenamenti recenti è elevata. Considera di inserire una sessione leggera o stretching per bilanciare il carico e prevenire infortuni.' });
+      if (totalKm7 > 0) advices.push({ icon: 'ti-trending-up', tag: 'PROGRESSIONE', text: `Questa settimana hai percorso ${totalKm7.toFixed(1)} km. Per migliorare in modo graduale e sicuro, la prossima settimana puoi provare a raggiungere ${(totalKm7 * 1.1).toFixed(1)} km (+10%).` });
+      if (badMoods >= 3) advices.push({ icon: 'ti-moon', tag: 'BENESSERE', text: 'In alcuni allenamenti recenti il tuo umore post-workout era basso. Controlla il riposo notturno e valuta di ridurre l\'intensità per qualche giorno.' });
+      if (!advices.length) advices.push({ icon: 'ti-star', tag: 'OTTIMO LAVORO', text: 'Stai andando alla grande! Continua a registrare le tue attività per ricevere consigli sempre più precisi e personalizzati.' });
+      advEl.innerHTML = advices.map(a => `<div class="advice-card"><div class="advice-header"><div class="advice-icon-wrap"><i class="ti ${a.icon}"></i></div><div><div class="advice-tag">${a.tag}</div></div></div><div class="advice-text">${a.text}</div></div>`).join('');
+    }
+
+    const sportMins = {};
+    activities.forEach(a => {
+      const n = a.sport.substring(a.sport.indexOf(' ') + 1);
+      sportMins[n] = (sportMins[n] || 0) + a.duration;
+    });
+    if (sportChart) { sportChart.destroy(); sportChart = null; }
+    const labels = Object.keys(sportMins);
+    if (labels.length) {
+      const palette = ['#5adf7c','#3aaf5c','#fac775','#f0997b','#85b7eb','#d4537e','#7f77dd'];
+      sportChart = new Chart(document.getElementById('sport-chart'), {
+        type: 'doughnut',
+        data: { labels, datasets: [{ data: Object.values(sportMins), backgroundColor: palette.slice(0, labels.length), borderWidth: 2, borderColor: '#1e2130' }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#8b90a8', font: { size: 12 }, padding: 14, boxWidth: 12, boxHeight: 12 } } } }
+      });
+    }
+  }
+
+  document.getElementById('act-date').value = new Date().toISOString().split('T')[0];
+  renderDashboard();
+</script>
+</body>
+</html>
