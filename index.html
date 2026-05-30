@@ -195,7 +195,6 @@
     .error-msg { display: none; align-items: center; gap: 10px; color: var(--danger); background: rgba(224,75,74,0.12); border: 1px solid rgba(224,75,74,0.2); border-radius: var(--radius-sm); padding: 12px 14px; margin-top: 12px; font-size: 14px; font-weight: 500; }
 
     /* HEATMAP */
-    .heatmap-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-top: 8px; }
     .heat-cell { aspect-ratio: 1; border-radius: 4px; background: var(--bg-input); cursor: pointer; position: relative; }
     .heat-cell::after { content: attr(data-tooltip); position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%) scale(0.9); background: var(--bg-card); color: var(--text-primary); font-size: 11px; padding: 4px 8px; border-radius: 4px; border: 1px solid var(--border); white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity 0.15s ease, transform 0.15s ease; }
     .heat-cell:hover::after { opacity: 1; transform: translateX(-50%) scale(1); }
@@ -205,7 +204,11 @@
     .heat-today { outline: 2px solid var(--accent); outline-offset: 1px; }
     .heatmap-legend { display: flex; align-items: center; gap: 6px; margin-top: 10px; font-size: 11px; color: var(--text-secondary); }
     .heatmap-legend span { width: 12px; height: 12px; border-radius: 2px; display: inline-block; }
-    .heatmap-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+    .heatmap-year-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .heatmap-year { display: grid; grid-auto-flow: column; grid-template-rows: repeat(7, 1fr); gap: 2px; }
+    .heatmap-year .heat-cell { aspect-ratio: 1; min-width: 10px; min-height: 10px; }
+    .heatmap-months { display: grid; grid-auto-flow: column; grid-template-rows: 1fr; gap: 2px; font-size: 9px; color: var(--text-secondary); margin-bottom: 4px; height: 14px; }
+    .heatmap-months span { text-align: left; padding-left: 2px; }
 
     /* PR */
     .pr-item { display: flex; align-items: center; justify-content: space-between; padding: 11px 0; border-bottom: 1px solid var(--border); }
@@ -257,6 +260,35 @@
     @keyframes rippleEffect { to { transform: scale(4); opacity: 0; } }
     @keyframes metricFlash { 0% { color: var(--accent); transform: scale(1.1); } 100% { color: var(--text-primary); transform: scale(1); } }
 
+    /* COMPARE CARD */
+    .cmp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 4px; }
+    .cmp-card { background: var(--bg-input); border-radius: var(--radius-sm); padding: 10px; text-align: center; }
+    .cmp-label { font-size: 10px; color: var(--text-secondary); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .cmp-val { font-size: 18px; font-weight: var(--fw-bold); display: block; }
+    .cmp-delta { font-size: 11px; font-weight: var(--fw-semibold); display: block; margin-top: 2px; }
+    .delta-up { color: #5adf7c; }
+    .delta-down { color: #e24b4a; }
+    .delta-same { color: var(--text-secondary); }
+
+    /* SUMMARY STATS */
+    .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .stat-item { text-align: center; padding: 12px; background: var(--bg-input); border-radius: var(--radius-sm); }
+    .stat-val { font-size: 22px; font-weight: var(--fw-bold); color: var(--text-primary); }
+    .stat-label { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
+
+    /* EXPORT BTN */
+    .export-btn { display: flex; align-items: center; gap: 6px; padding: 8px 14px; background: var(--bg-input); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text-secondary); font-size: 12px; cursor: pointer; transition: color 0.15s, border-color 0.15s; margin-left: auto; }
+    .export-btn:hover { color: var(--accent); border-color: var(--accent); }
+
+    /* MOOD TIMELINE */
+    .mood-timeline { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-top: 8px; }
+    .mood-timeline .mood-cell { text-align: center; font-size: 20px; padding: 6px 0; background: var(--bg-input); border-radius: var(--radius-sm); }
+    .mood-cell .mood-date-label { display: block; font-size: 9px; color: var(--text-secondary); margin-top: 2px; }
+    .mood-cell.empty { opacity: 0.15; }
+    .toggle-btn { flex:1; padding:6px 8px; border:1px solid var(--border); border-radius:var(--radius-sm); background:var(--bg-input); color:var(--text-secondary); font-size:11px; cursor:pointer; font-family:inherit; transition:border-color 0.15s,color 0.15s,background 0.15s; }
+    .toggle-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .toggle-btn.active { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+
     /* REDUCED MOTION */
     @media (prefers-reduced-motion: reduce) {
       .page, .week-bar, .nav-btn, .save-btn, .mood-btn, select, input, textarea, .btn-icon,
@@ -264,7 +296,7 @@
       .success-msg, .metric-val { transition: none !important; animation: none !important; transform: none !important; text-shadow: none !important; }
       .streak-banner::before { display: none; }
       .week-bar { transform: scaleY(1) !important; opacity: 1 !important; height: var(--bar-h, 4px) !important; }
-      canvas { display: none !important; }
+      canvas { opacity: 1 !important; }
     }
 
     /* === DESKTOP (≥768px) === */
@@ -327,7 +359,8 @@
       .form-row { grid-template-columns: repeat(3, 1fr); }
       .mood-btn { font-size: 28px; padding: 14px; }
 
-      .heatmap-grid { gap: 5px; max-width: 500px; }
+      .heatmap-year-wrap { max-width: 600px; }
+      .heatmap-year .heat-cell { min-width: 12px; min-height: 12px; }
 
       #advice-list { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 
@@ -344,6 +377,10 @@
       .activity-name { font-size: 15px; }
       .btn-icon { font-size: 16px; padding: 4px 6px; }
       .empty { padding: 48px 32px; }
+      .cmp-grid { grid-template-columns: repeat(4, 1fr); }
+      .stats-grid { grid-template-columns: repeat(4, 1fr); }
+      .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+      #chart-trend-8w { max-width: 600px; }
     }
   </style>
 </head>
@@ -362,6 +399,7 @@
   </div>
   <div class="sidebar-nav">
     <button class="nav-btn active" data-page="dashboard" type="button" aria-label="Dashboard"><i class="ti ti-layout-dashboard"></i> Dashboard</button>
+    <button class="nav-btn" data-page="compare" type="button" aria-label="Confronto"><i class="ti ti-arrows-exchange"></i> Confronto</button>
     <button class="nav-btn" data-page="log" type="button" aria-label="Aggiungi attività"><i class="ti ti-circle-plus"></i> Aggiungi</button>
     <button class="nav-btn" data-page="history" type="button" aria-label="Storico"><i class="ti ti-list-details"></i> Storico</button>
     <button class="nav-btn" data-page="insights" type="button" aria-label="Consigli"><i class="ti ti-bulb"></i> Consigli</button>
@@ -403,6 +441,11 @@
   </div>
 
   <div class="card">
+    <div class="card-label">Confronto con la settimana scorsa</div>
+    <div class="cmp-grid" id="cmp-grid"></div>
+  </div>
+
+  <div class="card">
     <div class="card-label">Questa settimana</div>
     <div class="week-bars" id="week-bars"></div>
   </div>
@@ -410,6 +453,26 @@
   <div class="card">
     <div class="card-label">Attività recenti</div>
     <div id="recent-list"></div>
+  </div>
+</div>
+
+<!-- COMPARE -->
+<div id="page-compare" class="page">
+  <div class="page-header">
+    <div class="page-title">Confronto settimanale</div>
+    <div class="page-sub">Settimana scorsa vs Questa settimana</div>
+  </div>
+  <div class="card">
+    <div class="card-label">Confronto metriche</div>
+    <div class="cmp-grid" id="cmp-compare-grid"></div>
+  </div>
+  <div class="card">
+    <div class="card-label">Trend ultime 8 settimane</div>
+    <div style="position:relative;height:200px"><canvas id="chart-trend-8w" role="img" aria-label="Grafico trend km per settimana"></canvas><div class="donut-empty" id="trend-empty">Nessun dato disponibile</div></div>
+  </div>
+  <div class="card">
+    <div class="card-label">Umore ultimi 14 giorni</div>
+    <div class="mood-timeline" id="mood-timeline"></div>
   </div>
 </div>
 
@@ -484,18 +547,18 @@
 <!-- HISTORY -->
 <div id="page-history" class="page">
   <div class="page-header">
-    <div class="page-title">Storico</div>
-    <div class="page-sub">I tuoi allenamenti passati</div>
+    <div style="display:flex;justify-content:space-between;align-items:flex-start">
+      <div>
+        <div class="page-title">Storico</div>
+        <div class="page-sub">I tuoi allenamenti passati</div>
+      </div>
+      <button class="export-btn" id="export-btn" type="button" aria-label="Esporta dati JSON"><i class="ti ti-download"></i> Export JSON</button>
+    </div>
   </div>
   <div class="card">
-    <div class="card-label">Heatmap mensile</div>
-    <div class="heatmap-nav">
-      <button class="btn-icon" id="heat-prev" aria-label="Mese precedente"><i class="ti ti-chevron-left"></i></button>
-      <span id="heat-month-label" style="font-size:13px;color:var(--text-secondary)"></span>
-      <button class="btn-icon" id="heat-next" aria-label="Mese successivo"><i class="ti ti-chevron-right"></i></button>
-    </div>
-    <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-secondary);margin-bottom:4px" id="heatmap-days-label"></div>
-    <div class="heatmap-grid" id="heatmap"></div>
+    <div class="card-label">Heatmap annuale</div>
+    <div class="heatmap-months" id="heatmap-months"></div>
+    <div class="heatmap-year-wrap"><div class="heatmap-year" id="heatmap-year"></div></div>
     <div class="heatmap-legend">
       <span>Meno</span>
       <span style="background:var(--bg-input);border:1px solid var(--border)"></span>
@@ -504,6 +567,10 @@
       <span class="heat-3"></span>
       <span>Di più</span>
     </div>
+  </div>
+  <div class="card" id="summary-stats-card">
+    <div class="card-label">Riepilogo statistiche</div>
+    <div class="stats-grid" id="stats-grid"></div>
   </div>
   <div class="card">
     <div class="card-label">Record personali</div>
@@ -523,7 +590,12 @@
   </div>
   <div id="advice-list"></div>
   <div class="card">
-    <div class="card-label">Sport per tempo (minuti)</div>
+    <div class="card-label" id="donut-label">Sport per tempo</div>
+    <div style="display:flex;gap:6px;margin-bottom:12px" id="donut-toggles">
+      <button class="toggle-btn active" data-metric="minutes" type="button">Minuti</button>
+      <button class="toggle-btn" data-metric="sessions" type="button">Sessioni</button>
+      <button class="toggle-btn" data-metric="distance" type="button">Distanza</button>
+    </div>
     <div class="donut-wrap"><canvas id="sport-chart" role="img" aria-label="Grafico distribuzione sport"></canvas><div class="donut-empty" id="donut-empty">Nessun dato disponibile</div></div>
   </div>
 </div>
@@ -532,6 +604,9 @@
 <nav class="nav">
   <button class="nav-btn active" data-page="dashboard" type="button" aria-label="Dashboard">
     <i class="ti ti-layout-dashboard"></i>Dashboard
+  </button>
+  <button class="nav-btn" data-page="compare" type="button" aria-label="Confronto">
+    <i class="ti ti-arrows-exchange"></i>Confronto
   </button>
   <button class="nav-btn" data-page="log" type="button" aria-label="Aggiungi attività">
     <i class="ti ti-circle-plus"></i>Aggiungi
@@ -635,7 +710,9 @@
   let selectedMood = '😊';
   let editingId = null;
   let sportChart = null;
-  let heatmapMonth = new Date();
+  let chartTrend8w = null;
+  let doughnutMetric = 'minutes';
+
 
   // ===== UTILITIES =====
   function todayStr() {
@@ -683,6 +760,98 @@
   }
   function hideError() {
     document.getElementById('form-error').style.display = 'none';
+  }
+
+  // ===== PHASE 2 — COMPARE & STATS =====
+  function getWeekComparison() {
+    var now = todayMidnight();
+    var t = { km: 0, sessions: 0, min: 0, cal: 0 };
+    var l = { km: 0, sessions: 0, min: 0, cal: 0 };
+    activities.forEach(function(a) {
+      var diff = daysBetween(now, dateFromStr(a.date));
+      if (diff >= 0 && diff < 7) {
+        t.km += a.distance; t.sessions++; t.min += a.duration; t.cal += calcCalories(a.duration, a.intensity);
+      } else if (diff >= 7 && diff < 14) {
+        l.km += a.distance; l.sessions++; l.min += a.duration; l.cal += calcCalories(a.duration, a.intensity);
+      }
+    });
+    var d = {};
+    ['km', 'sessions', 'min', 'cal'].forEach(function(k) {
+      var abs = t[k] - l[k];
+      var pct = l[k] > 0 ? ((abs / l[k]) * 100).toFixed(0) : (t[k] > 0 ? '+100' : '0');
+      d[k] = { abs: abs, pct: pct, dir: abs > 0 ? 'up' : (abs < 0 ? 'down' : 'same') };
+    });
+    return { t: t, l: l, d: d };
+  }
+
+  function getSummaryStats() {
+    if (!activities.length) return null;
+    var wk = {}, mk = {};
+    activities.forEach(function(a) {
+      var d = dateFromStr(a.date);
+      var ws = new Date(d); var day = d.getDay() || 7; ws.setDate(d.getDate() - day + 1);
+      var wKey = ws.toISOString().split('T')[0];
+      wk[wKey] = (wk[wKey] || 0) + a.distance;
+      var mKey = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+      mk[mKey] = (mk[mKey] || 0) + a.distance;
+    });
+    var bestWeek = Math.max.apply(null, Object.values(wk).concat([0]));
+    var bestMonth = Math.max.apply(null, Object.values(mk).concat([0]));
+    var totalKm = activities.reduce(function(s, a) { return s + a.distance; }, 0);
+    var avgSession = totalKm / activities.length;
+    var firstDate = dateFromStr(activities[activities.length - 1].date);
+    var weeksActive = Math.max(1, Math.ceil(daysBetween(todayMidnight(), firstDate) / 7));
+    var avgWeek = totalKm / weeksActive;
+    return { bestWeek: bestWeek, bestMonth: bestMonth, avgSession: avgSession, avgWeek: avgWeek };
+  }
+
+  function getMoodTimeline(days) {
+    days = days || 14;
+    var moodMap = {};
+    activities.forEach(function(a) { moodMap[a.date] = a.mood; });
+    var result = [];
+    var now = todayMidnight();
+    for (var i = days - 1; i >= 0; i--) {
+      var d = new Date(now.getTime() - i * MS_PER_DAY);
+      var key = d.toISOString().split('T')[0];
+      result.push({
+        date: key,
+        mood: moodMap[key] || null,
+        dayNum: d.getDate(),
+        dayName: d.toLocaleDateString('it-IT', { weekday: 'short' })
+      });
+    }
+    return result;
+  }
+
+  function getWeeklyKm(weeks) {
+    weeks = weeks || 8;
+    var result = [];
+    var now = todayMidnight();
+    for (var w = weeks - 1; w >= 0; w--) {
+      var weekEnd = new Date(now.getTime() - w * 7 * MS_PER_DAY);
+      weekEnd.setHours(23, 59, 59, 999);
+      var weekStart = new Date(weekEnd.getTime() - 6 * MS_PER_DAY);
+      weekStart.setHours(0, 0, 0, 0);
+      var km = 0;
+      activities.forEach(function(a) {
+        var d = dateFromStr(a.date);
+        if (d >= weekStart && d <= weekEnd) km += a.distance;
+      });
+      var label = weekStart.toLocaleDateString('it-IT', { day: 'numeric', month: 'short' });
+      result.push({ label: label, km: km });
+    }
+    return result;
+  }
+
+  function exportJSON() {
+    if (!activities.length) return;
+    var blob = new Blob([JSON.stringify(activities, null, 2)], { type: 'application/json' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = 'athletelog-' + todayStr() + '.json';
+    document.body.appendChild(a); a.click();
+    document.body.removeChild(a); URL.revokeObjectURL(url);
   }
 
   // ===== ANIMATIONS =====
@@ -828,6 +997,7 @@
     if (btn) btn.classList.add('active');
     if (id === 'log') resetForm();
     if (id === 'dashboard') renderDashboard();
+    if (id === 'compare') renderCompare();
     if (id === 'history') renderHistory();
     if (id === 'insights') renderInsights();
   }
@@ -1015,6 +1185,23 @@
     }).join('');
     animateWeekBars();
 
+    var cmp = getWeekComparison();
+    var cmpGrid = document.getElementById('cmp-grid');
+    var cmpLabels = { km: 'Km', sessions: 'Uscite', min: 'Minuti', cal: 'Calorie' };
+    var cmpUnits = { km: 'km', sessions: '', min: 'min', cal: 'kcal' };
+    cmpGrid.innerHTML = '';
+    ['km', 'sessions', 'min', 'cal'].forEach(function(k) {
+      var card = document.createElement('div');
+      card.className = 'cmp-card';
+      var abs = cmp.d[k].abs;
+      var arrow = cmp.d[k].dir === 'up' ? '▲' : (cmp.d[k].dir === 'down' ? '▼' : '—');
+      var cls = cmp.d[k].dir === 'up' ? 'delta-up' : (cmp.d[k].dir === 'down' ? 'delta-down' : 'delta-same');
+      card.innerHTML = '<div class="cmp-label">' + cmpLabels[k] + '</div>'
+        + '<span class="cmp-val">' + (k === 'km' ? cmp.t[k].toFixed(1) : Math.round(cmp.t[k])) + ' <span style="font-size:11px;color:var(--text-secondary)">' + cmpUnits[k] + '</span></span>'
+        + '<span class="cmp-delta ' + cls + '">' + arrow + ' ' + (abs > 0 ? '+' : '') + (k === 'km' ? abs.toFixed(1) : Math.round(abs)) + ' <span style="font-weight:400">' + (cmp.d[k].pct !== '0' ? '(' + cmp.d[k].pct + '%)' : '') + '</span></span>';
+      cmpGrid.appendChild(card);
+    });
+
     var recentEl = document.getElementById('recent-list');
     recentEl.innerHTML = '';
     if (activities.length === 0) {
@@ -1040,32 +1227,76 @@
   }
 
   function renderHistory() {
-    var year = heatmapMonth.getFullYear();
-    var month = heatmapMonth.getMonth();
-    var daysInMonth = new Date(year, month + 1, 0).getDate();
-    var heatData = {};
+    var year = new Date().getFullYear();
+    var dayCount = {};
+    var maxCount = 0;
     activities.forEach(function(a) {
       var d = dateFromStr(a.date);
-      if (d.getMonth() === month && d.getFullYear() === year) {
-        var day = d.getDate();
-        heatData[day] = (heatData[day] || 0) + 1;
+      if (d.getFullYear() === year) {
+        dayCount[a.date] = (dayCount[a.date] || 0) + 1;
+        if (dayCount[a.date] > maxCount) maxCount = dayCount[a.date];
       }
     });
-    var firstDay = (new Date(year, month, 1).getDay() + 6) % 7;
-    var heatHtml = '';
-    for (var i = 0; i < firstDay; i++) heatHtml += '<div class="heat-cell"></div>';
-    var today = new Date();
-    for (var d = 1; d <= daysInMonth; d++) {
-      var cnt = heatData[d] || 0;
-      var cls = cnt === 0 ? '' : cnt === 1 ? 'heat-1' : cnt === 2 ? 'heat-2' : 'heat-3';
-      var isToday = (d === today.getDate() && month === today.getMonth() && year === today.getFullYear()) ? 'heat-today' : '';
-      heatHtml += '<div class="heat-cell ' + cls + ' ' + isToday + '" data-tooltip="' + d + ' — ' + cnt + ' attività"></div>';
+    var jan1 = new Date(year, 0, 1);
+    var startDow = (jan1.getDay() + 6) % 7;
+    var start = new Date(jan1);
+    start.setDate(jan1.getDate() - startDow);
+    var dec31 = new Date(year, 11, 31);
+    var endDow = (dec31.getDay() + 6) % 7;
+    var end = new Date(dec31);
+    end.setDate(dec31.getDate() + (6 - endDow));
+    var totalDays = Math.round((end - start) / MS_PER_DAY) + 1;
+    var totalCols = Math.ceil(totalDays / 7);
+    var todayStrCache = todayStr();
+    function heatClass(cnt) {
+      if (cnt === 0) return '';
+      var ratio = cnt / (Math.max(maxCount, 1));
+      if (ratio > 0.66) return 'heat-3';
+      if (ratio > 0.33) return 'heat-2';
+      return 'heat-1';
     }
-    document.getElementById('heatmap').innerHTML = heatHtml;
-    document.getElementById('heatmap-days-label').innerHTML = DAYS_MIN.map(function(d) {
-      return '<span style="flex:1;text-align:center">' + d + '</span>';
-    }).join('');
-    document.getElementById('heat-month-label').textContent = heatmapMonth.toLocaleDateString('it-IT', { month: 'long', year: 'numeric' });
+    var cellsHtml = '';
+    var monthStarts = {};
+    for (var walk = new Date(start); walk <= end; walk.setDate(walk.getDate() + 1)) {
+      var key = walk.toISOString().split('T')[0];
+      var cnt = dayCount[key] || 0;
+      var cls = heatClass(cnt);
+      var isToday = key === todayStrCache ? ' heat-today' : '';
+      cellsHtml += '<div class="heat-cell ' + cls + isToday + '" data-tooltip="' + key.split('-').reverse().join('/') + ' — ' + cnt + ' attività"></div>';
+      var dayIdx = Math.round((walk - start) / MS_PER_DAY);
+      var colIdx = Math.floor(dayIdx / 7);
+      var m = walk.getMonth();
+      if (monthStarts[m] === undefined) monthStarts[m] = colIdx;
+    }
+    document.getElementById('heatmap-year').style.gridTemplateColumns = 'repeat(' + totalCols + ', 1fr)';
+    document.getElementById('heatmap-year').innerHTML = cellsHtml;
+    var monthNames = ['Gen', 'Feb', 'Mar', 'Apr', 'Mag', 'Giu', 'Lug', 'Ago', 'Set', 'Ott', 'Nov', 'Dic'];
+    var monthsHtml = '';
+    for (var m = 0; m < 12; m++) {
+      if (monthStarts[m] !== undefined) {
+        var sc = monthStarts[m];
+        var ec = totalCols;
+        for (var n = m + 1; n < 12; n++) {
+          if (monthStarts[n] !== undefined) { ec = monthStarts[n]; break; }
+        }
+        monthsHtml += '<span style="grid-column:' + (sc + 1) + '/span ' + (ec - sc) + '">' + monthNames[m] + '</span>';
+      }
+    }
+    var monthsEl = document.getElementById('heatmap-months');
+    monthsEl.style.gridTemplateColumns = 'repeat(' + totalCols + ', 1fr)';
+    monthsEl.innerHTML = monthsHtml;
+
+    var stats = getSummaryStats();
+    var statsGrid = document.getElementById('stats-grid');
+    if (stats) {
+      document.getElementById('summary-stats-card').style.display = 'block';
+      statsGrid.innerHTML = '<div class="stat-item"><div class="stat-val">' + stats.bestWeek.toFixed(1) + '</div><div class="stat-label">Miglior settimana</div></div>'
+        + '<div class="stat-item"><div class="stat-val">' + stats.bestMonth.toFixed(1) + '</div><div class="stat-label">Miglior mese</div></div>'
+        + '<div class="stat-item"><div class="stat-val">' + stats.avgSession.toFixed(1) + '</div><div class="stat-label">Media sessione</div></div>'
+        + '<div class="stat-item"><div class="stat-val">' + stats.avgWeek.toFixed(1) + '</div><div class="stat-label">Media / settimana</div></div>';
+    } else {
+      document.getElementById('summary-stats-card').style.display = 'none';
+    }
 
     var maxRun = 0;
     activities.forEach(function(a) { if (a.distance > maxRun) maxRun = a.distance; });
@@ -1118,24 +1349,90 @@
       }).join('');
     }
 
-    var sportMins = {};
+    var sportData = {};
     activities.forEach(function(a) {
       var name = sportName(a.sport);
-      sportMins[name] = (sportMins[name] || 0) + a.duration;
+      if (doughnutMetric === 'sessions') sportData[name] = (sportData[name] || 0) + 1;
+      else if (doughnutMetric === 'distance') sportData[name] = (sportData[name] || 0) + a.distance;
+      else sportData[name] = (sportData[name] || 0) + a.duration;
     });
+    var labelMap = { minutes: 'Sport per tempo', sessions: 'Sport per sessioni', distance: 'Sport per distanza' };
+    document.getElementById('donut-label').textContent = labelMap[doughnutMetric] || 'Sport per tempo';
     if (sportChart) { sportChart.destroy(); sportChart = null; }
-    var labels = Object.keys(sportMins);
+    var labels = Object.keys(sportData);
     var donutEmpty = document.getElementById('donut-empty');
     if (labels.length) {
       donutEmpty.style.display = 'none';
       sportChart = new Chart(document.getElementById('sport-chart'), {
         type: 'doughnut',
-        data: { labels: labels, datasets: [{ data: Object.values(sportMins), backgroundColor: labels.map(function(_, i) { return PALETTE[i % PALETTE.length]; }), borderWidth: 2, borderColor: '#1e2130' }] },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#8b90a8', font: { size: 12 }, padding: 14, boxWidth: 12, boxHeight: 12 } } } }
+        data: { labels: labels, datasets: [{ data: Object.values(sportData), backgroundColor: labels.map(function(_, i) { return PALETTE[i % PALETTE.length]; }), borderWidth: 2, borderColor: '#1e2130' }] },
+        options: { responsive: true, maintainAspectRatio: false, animation: { duration: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : undefined }, plugins: { legend: { position: 'bottom', labels: { color: '#8b90a8', font: { size: 12 }, padding: 14, boxWidth: 12, boxHeight: 12 } } } }
       });
     } else {
       donutEmpty.style.display = 'flex';
     }
+  }
+
+  function renderCompare() {
+    var cmp = getWeekComparison();
+    var grid = document.getElementById('cmp-compare-grid');
+    var labels = { km: 'Km', sessions: 'Uscite', min: 'Minuti', cal: 'Calorie' };
+    var units = { km: 'km', sessions: '', min: 'min', cal: 'kcal' };
+    grid.innerHTML = '';
+    ['km', 'sessions', 'min', 'cal'].forEach(function(k) {
+      var card = document.createElement('div');
+      card.className = 'cmp-card';
+      var abs = cmp.d[k].abs;
+      var arrow = cmp.d[k].dir === 'up' ? '▲' : (cmp.d[k].dir === 'down' ? '▼' : '—');
+      var cls = cmp.d[k].dir === 'up' ? 'delta-up' : (cmp.d[k].dir === 'down' ? 'delta-down' : 'delta-same');
+      card.innerHTML = '<div class="cmp-label">' + labels[k] + '</div>'
+        + '<span class="cmp-val">' + (k === 'km' ? cmp.t[k].toFixed(1) : Math.round(cmp.t[k])) + ' <span style="font-size:11px;color:var(--text-secondary)">' + units[k] + '</span></span>'
+        + '<span class="cmp-delta ' + cls + '">' + arrow + ' ' + (abs > 0 ? '+' : '') + (k === 'km' ? abs.toFixed(1) : Math.round(abs)) + ' <span style="font-weight:400">' + (cmp.d[k].pct !== '0' ? '(' + cmp.d[k].pct + '%)' : '') + '</span></span>';
+      grid.appendChild(card);
+    });
+
+    var weekly = getWeeklyKm(8);
+    var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (chartTrend8w) { chartTrend8w.destroy(); chartTrend8w = null; }
+    var trendEmpty = document.getElementById('trend-empty');
+    var hasData = weekly.some(function(w) { return w.km > 0; });
+    if (hasData) {
+      trendEmpty.style.display = 'none';
+      chartTrend8w = new Chart(document.getElementById('chart-trend-8w'), {
+        type: 'bar',
+        data: {
+          labels: weekly.map(function(w) { return w.label; }),
+          datasets: [{
+            data: weekly.map(function(w) { return w.km; }),
+            backgroundColor: weekly.map(function(w) { return w.km > 0 ? '#5adf7c' : '#1e3a28'; }),
+            borderRadius: 4, borderSkipped: false
+          }]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          animation: { duration: reducedMotion ? 0 : 800 },
+          plugins: {
+            legend: { display: false },
+            tooltip: { backgroundColor: '#1a1d27', titleColor: '#f0f2ff', bodyColor: '#8b90a8', borderColor: 'rgba(255,255,255,0.06)', borderWidth: 1 }
+          },
+          scales: {
+            x: { grid: { display: false }, ticks: { color: '#8b90a8', font: { size: 10 } } },
+            y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#8b90a8' } }
+          }
+        }
+      });
+    } else {
+      trendEmpty.style.display = 'flex';
+    }
+
+    var moodData = getMoodTimeline(14);
+    var moodEl = document.getElementById('mood-timeline');
+    moodEl.innerHTML = moodData.map(function(d) {
+      var hasMood = d.mood !== null;
+      return '<div class="mood-cell' + (hasMood ? '' : ' empty') + '">'
+        + (hasMood ? d.mood : '·')
+        + '<span class="mood-date-label">' + d.dayName + ' ' + d.dayNum + '</span></div>';
+    }).join('');
   }
 
   // ===== EVENT HANDLERS =====
@@ -1190,14 +1487,18 @@
     setupActionDelegation('recent-list');
     setupActionDelegation('all-activities');
 
-    document.getElementById('heat-prev').addEventListener('click', function() {
-      heatmapMonth.setMonth(heatmapMonth.getMonth() - 1);
-      renderHistory();
+    document.getElementById('export-btn').addEventListener('click', exportJSON);
+
+    document.getElementById('donut-toggles').addEventListener('click', function(e) {
+      var btn = e.target.closest('.toggle-btn');
+      if (!btn) return;
+      document.querySelectorAll('#donut-toggles .toggle-btn').forEach(function(b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      doughnutMetric = btn.getAttribute('data-metric');
+      renderInsights();
     });
-    document.getElementById('heat-next').addEventListener('click', function() {
-      heatmapMonth.setMonth(heatmapMonth.getMonth() + 1);
-      renderHistory();
-    });
+
+
 
     activities = Store.load();
     document.getElementById('act-date').value = todayStr();
