@@ -75,9 +75,16 @@
     .card {
       background: var(--bg-glass); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
       border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px; margin-bottom: 14px;
-      box-shadow: var(--shadow-sm); transition: box-shadow 0.2s, border-color 0.2s, transform 0.2s;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2), 0 8px 24px rgba(0,0,0,0.12), 0 16px 48px rgba(0,0,0,0.08);
+      transition: box-shadow 0.25s cubic-bezier(0.4,0,0.2,1), border-color 0.2s, transform 0.25s cubic-bezier(0.4,0,0.2,1);
+      position: relative;
     }
-    .card:hover { border-color: var(--border-hover); box-shadow: var(--shadow-md); transform: translateY(-1px); }
+    .card::before {
+      content: ''; position: absolute; top: 0; left: 8px; right: 8px; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.07), transparent);
+      border-radius: var(--radius-lg) var(--radius-lg) 0 0; pointer-events: none;
+    }
+    .card:hover { border-color: var(--border-hover); box-shadow: 0 4px 8px rgba(0,0,0,0.25), 0 16px 40px rgba(0,0,0,0.18), 0 24px 64px rgba(0,0,0,0.12); transform: translateY(-2px); }
     .card-label { font-size: 11px; font-weight: var(--fw-semibold); letter-spacing: 0.8px; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 12px; }
 
     /* STREAK BANNER */
@@ -102,12 +109,30 @@
 
     /* METRIC GRID */
     .metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
-    .metric-card { background: var(--bg-glass); backdrop-filter: blur(12px); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 14px; box-shadow: var(--shadow-sm); transition: transform 0.15s, box-shadow 0.15s; }
-    .metric-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+    .metric-card { background: var(--bg-glass); backdrop-filter: blur(12px); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 14px; box-shadow: 0 4px 8px rgba(0,0,0,0.2), 0 8px 24px rgba(0,0,0,0.12); transition: transform 0.25s cubic-bezier(0.4,0,0.2,1), box-shadow 0.25s cubic-bezier(0.4,0,0.2,1); position: relative; }
+    .metric-card:hover { transform: translateY(-3px); box-shadow: 0 6px 12px rgba(0,0,0,0.25), 0 12px 32px rgba(0,0,0,0.18); }
     .metric-label { font-size: 11px; color: var(--text-secondary); margin-bottom: 6px; font-weight: var(--fw-light); }
-    .metric-val { font-size: 26px; font-weight: var(--fw-bold); color: var(--text-primary); line-height: 1; }
+    .metric-val { font-size: 32px; font-weight: var(--fw-bold); color: var(--text-primary); line-height: 1; letter-spacing: -0.5px; }
     .metric-val.flash { animation: metricFlash 0.3s ease; }
     .metric-unit { font-size: 13px; font-weight: var(--fw-regular); color: var(--text-secondary); }
+
+    /* LEVEL & XP */
+    .level-row { display: flex; align-items: center; gap: 12px; padding: 12px 16px !important; }
+    .level-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text-secondary); font-weight: var(--fw-semibold); flex-shrink: 0; }
+    .level-badge .lv-num { color: var(--accent); font-weight: var(--fw-bold); font-size: 16px; }
+    .level-badge i { font-size: 18px; color: var(--accent-warm); }
+    .xp-bar-wrap { flex: 1; height: 4px; background: var(--bg-input); border-radius: 4px; overflow: hidden; min-width: 60px; }
+    .xp-bar-fill { height: 100%; background: var(--gradient-green); border-radius: 4px; transition: width 0.8s cubic-bezier(0.4,0,0.2,1); }
+    .xp-label { font-size: 11px; color: var(--text-secondary); flex-shrink: 0; white-space: nowrap; }
+    .sidebar-level { padding: 12px 24px; border-bottom: 1px solid var(--border); }
+    .sidebar-level .xp-bar-wrap { height: 3px; margin-top: 6px; }
+    .sidebar-level .xp-label { font-size: 10px; margin-top: 4px; }
+
+    /* DRAG & DROP EXERCISES */
+    .drag-handle { cursor: grab; color: var(--text-secondary); font-size: 14px; padding: 4px 2px; flex-shrink: 0; user-select: none; line-height: 1; opacity: 0.5; transition: opacity 0.15s; letter-spacing: -1px; }
+    .drag-handle:hover { opacity: 1; }
+    .exercise-row.dragging { opacity: 0.4; }
+    .exercise-row.drag-over { border-color: var(--accent) !important; box-shadow: 0 0 0 1px var(--accent); }
 
     /* ACTIVITY ITEMS */
     .activity-item { display: flex; align-items: flex-start; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--border); }
@@ -126,6 +151,7 @@
 
     /* BADGES */
     .badge { display: inline-block; font-size: 10px; font-weight: var(--fw-semibold); padding: 2px 8px; border-radius: 99px; margin-top: 4px; }
+    .badge-item { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; background: var(--bg-input); border: 1px solid var(--border); border-radius: 99px; font-size: 12px; color: var(--text-secondary); }
     .badge-easy { background: rgba(90,223,124,0.12); color: #5adf7c; }
     .badge-medium { background: rgba(250,199,117,0.12); color: #fac775; }
     .badge-hard { background: rgba(240,153,123,0.12); color: #f0997b; }
@@ -308,7 +334,7 @@
     @media (prefers-reduced-motion: reduce) {
       .page, .week-bar, .nav-btn, .save-btn, .mood-btn, select, input, textarea, .btn-icon,
       .card, .streak-num, .streak-banner, .advice-card, .heat-cell, .range-wrap input[type=range]::-webkit-slider-thumb,
-      .success-msg, .metric-val { transition: none !important; animation: none !important; transform: none !important; text-shadow: none !important; }
+      .success-msg, .metric-val, .xp-bar-fill, .exercise-row { transition: none !important; animation: none !important; transform: none !important; text-shadow: none !important; }
       .streak-banner::before { display: none; }
       .week-bar { transform: scaleY(1) !important; opacity: 1 !important; height: var(--bar-h, 4px) !important; }
       canvas { opacity: 1 !important; }
@@ -363,7 +389,7 @@
       .page-sub { font-size: 15px; }
 
       .metric-grid { grid-template-columns: repeat(4, 1fr); gap: 14px; }
-      .metric-val { font-size: 32px; }
+      .metric-val { font-size: 40px; }
 
       .streak-banner { padding: 24px 28px; }
       .streak-name { font-size: 24px; }
@@ -412,6 +438,11 @@
       <div class="sidebar-greeting-sub" id="sidebar-greeting-sub">Carica la tua prima uscita</div>
     </div>
   </div>
+  <div class="sidebar-level" id="sidebar-level">
+    <div class="level-badge"><i class="ti ti-star"></i> <span class="lv-num" id="sidebar-lv-num">Lv.1</span> <span id="sidebar-lv-title">Principiante</span></div>
+    <div class="xp-bar-wrap"><div class="xp-bar-fill" id="sidebar-xp-fill" style="width:0%"></div></div>
+    <div class="xp-label"><span id="sidebar-xp-text">0 XP</span></div>
+  </div>
   <div class="sidebar-nav">
     <button class="nav-btn active" data-page="dashboard" type="button" aria-label="Dashboard"><i class="ti ti-layout-dashboard"></i> Dashboard</button>
     <button class="nav-btn" data-page="compare" type="button" aria-label="Confronto"><i class="ti ti-arrows-exchange"></i> Confronto</button>
@@ -434,6 +465,12 @@
       <div class="streak-sub" id="streak-sub">Carica la tua prima uscita</div>
     </div>
     <div class="streak-num" id="streak-badge">🎯</div>
+  </div>
+
+  <div class="card level-row" id="level-row">
+    <div class="level-badge"><i class="ti ti-star"></i> <span class="lv-num" id="dash-lv-num">Lv.1</span> <span id="dash-lv-title">Principiante</span></div>
+    <div class="xp-bar-wrap"><div class="xp-bar-fill" id="dash-xp-fill" style="width:0%"></div></div>
+    <div class="xp-label"><span id="dash-xp-text">0 XP</span></div>
   </div>
 
   <div class="metric-grid">
@@ -606,6 +643,10 @@
     <div class="card-label">Riepilogo statistiche</div>
     <div class="stats-grid" id="stats-grid"></div>
   </div>
+  <div class="card" id="badge-card" style="display:none">
+    <div class="card-label">Badge sbloccati</div>
+    <div id="badge-list" style="display:flex;flex-wrap:wrap;gap:8px"></div>
+  </div>
   <div class="card">
     <div class="card-label">Record personali</div>
     <div id="pr-list"></div>
@@ -702,6 +743,7 @@
 
 <template id="tpl-exercise">
   <div class="exercise-row">
+    <span class="drag-handle" draggable="true" aria-label="Sposta">⠿</span>
     <input type="text" class="ex-name" placeholder="Esercizio" />
     <input type="number" class="ex-sets" placeholder="4" min="1" />
     <span class="ex-x">×</span>
@@ -846,6 +888,32 @@
   }
   function getCalories(a) {
     return (a.calories && a.calories > 0) ? a.calories : calcCalories(a.duration, a.intensity);
+  }
+
+  var LVL_THRESHOLDS = [0, 5, 15, 30, 50, 80, 120];
+  var LVL_TITLES = ['🌟 Principiante', '🌱 Apprendista', '📊 Costante', '⚡ Atleta', '💪 Guerriero', '🔥 Maratoneta', '🏆 Leggenda'];
+
+  function getLevelInfo(total) {
+    var lvl = 0;
+    for (var i = LVL_THRESHOLDS.length - 1; i >= 0; i--) {
+      if (total >= LVL_THRESHOLDS[i]) { lvl = i; break; }
+    }
+    var curr = LVL_THRESHOLDS[lvl];
+    var next = LVL_THRESHOLDS[lvl + 1] || total;
+    var progress = Math.min(1, (total - curr) / Math.max(next - curr, 1));
+    return { level: lvl + 1, title: LVL_TITLES[lvl], progress: progress, xp: total, nextXp: next };
+  }
+
+  function getBadges() {
+    var list = [];
+    if (activities.length > 0) list.push('🎯 Prima attività');
+    var s = calcStreak();
+    if (s >= 7) list.push('⚡ Streak 7 giorni');
+    if (s >= 14) list.push('🔥 Streak 14 giorni');
+    if (s >= 30) list.push('💯 Streak 30 giorni');
+    if (activities.length >= 50) list.push('🏅 50 attività');
+    if (activities.length >= 100) list.push('🏆 100 attività');
+    return list;
   }
 
   // ===== PHASE 2 — COMPARE & STATS =====
@@ -1138,6 +1206,32 @@
     if (reps) row.querySelector('.ex-reps').value = reps;
     if (weight) row.querySelector('.ex-weight').value = weight;
     row.querySelector('.ex-del').addEventListener('click', function() { row.remove(); });
+    row.draggable = true;
+    row.addEventListener('dragstart', function(e) {
+      e.dataTransfer.setData('text/plain', '');
+      row.classList.add('dragging');
+    });
+    row.addEventListener('dragend', function() {
+      row.classList.remove('dragging');
+      document.querySelectorAll('.exercise-row.drag-over').forEach(function(r) { r.classList.remove('drag-over'); });
+    });
+    row.addEventListener('dragover', function(e) {
+      e.preventDefault();
+      document.querySelectorAll('.exercise-row.drag-over').forEach(function(r) { r.classList.remove('drag-over'); });
+      row.classList.add('drag-over');
+    });
+    row.addEventListener('dragleave', function() {
+      row.classList.remove('drag-over');
+    });
+    row.addEventListener('drop', function(e) {
+      e.preventDefault();
+      document.querySelectorAll('.exercise-row.drag-over').forEach(function(r) { r.classList.remove('drag-over'); });
+      var dragging = document.querySelector('#exercise-list .dragging');
+      if (dragging && dragging !== row) {
+        var parent = document.getElementById('exercise-list');
+        parent.insertBefore(dragging, row.nextSibling === dragging ? row : row.nextSibling);
+      }
+    });
     document.getElementById('exercise-list').appendChild(clone);
   }
 
@@ -1369,6 +1463,17 @@
       }
     }
 
+    var lv = getLevelInfo(activities.length);
+    document.getElementById('dash-lv-num').textContent = 'Lv.' + lv.level;
+    document.getElementById('dash-lv-title').textContent = lv.title;
+    document.getElementById('dash-xp-fill').style.width = (lv.progress * 100) + '%';
+    document.getElementById('dash-xp-text').textContent = lv.xp + ' / ' + lv.nextXp + ' XP';
+
+    document.getElementById('sidebar-lv-num').textContent = 'Lv.' + lv.level;
+    document.getElementById('sidebar-lv-title').textContent = lv.title;
+    document.getElementById('sidebar-xp-fill').style.width = (lv.progress * 100) + '%';
+    document.getElementById('sidebar-xp-text').textContent = lv.xp + ' / ' + lv.nextXp + ' XP';
+
     document.getElementById('sidebar-streak').textContent = streak > 0 ? streak + (streak >= STREAK_FIRE ? '🔥' : '⚡') : '—';
     document.getElementById('sidebar-week').textContent = weekTotalKm.toFixed(1) + ' km';
     document.getElementById('sidebar-today').textContent = weekDur[(now.getDay() + 6) % 7] > 0 ? '✅ ' + weekDur[(now.getDay() + 6) % 7] + 'min' : '—';
@@ -1448,6 +1553,17 @@
         + '<div class="stat-item"><div class="stat-val">' + stats.avgWeek.toFixed(1) + '</div><div class="stat-label">Media / settimana</div></div>';
     } else {
       document.getElementById('summary-stats-card').style.display = 'none';
+    }
+
+    var badges = getBadges();
+    var badgeEl = document.getElementById('badge-list');
+    if (badges.length) {
+      badgeEl.innerHTML = badges.map(function(b) {
+        return '<span class="badge-item">' + b + '</span>';
+      }).join('');
+      document.getElementById('badge-card').style.display = 'block';
+    } else {
+      document.getElementById('badge-card').style.display = 'none';
     }
 
     var streak = calcStreak();
